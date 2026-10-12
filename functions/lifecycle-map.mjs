@@ -1,6 +1,6 @@
 /** Pure logic for trial lifecycle messages. */
 import { timingSafeEqual } from "node:crypto";
-import { MAIL_REPLY_TO, escapeHtml, mailAction, mailLang, renderMail } from "./mail-map.mjs";
+import { MAIL_REPLY_TO, escapeHtml, firstName, mailAction, mailLang, renderMail } from "./mail-map.mjs";
 
 export const DAY = 86400000;
 export const LIFECYCLE_STEPS = Object.freeze(["survey", "tips", "reminder"]);
@@ -379,8 +379,9 @@ export function lifecycleMessage(step, { lang, displayName, until, uid, token })
   const web = Object.fromEntries(Object.entries(links).map(([key, path]) => [key, `https://liczmat.com${path}`]));
   const unsub = mailPageUrl(code, { a: "unsub", u: uid, t: token });
   const oneClick = `${MAIL_LINK_URL}?a=unsub&u=${encodeURIComponent(uid)}&t=${encodeURIComponent(token)}`;
-  const greetingText = t.greeting(displayName);
-  const greetingHtml = t.greeting(escapeHtml(displayName));
+  const name = firstName(displayName);
+  const greetingText = t.greeting(name);
+  const greetingHtml = t.greeting(escapeHtml(name));
   let subject;
   let body;
   if (step === "survey") {

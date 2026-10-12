@@ -106,6 +106,21 @@ for (const [lang, preposition] of Object.entries(datePrepositions)) {
   check(`${lang} reminder date preposition`, reminder.subject.toLowerCase().includes(preposition) && reminder.text.toLowerCase().includes(preposition));
 }
 
+// The owner, 2026-10-12: "Cześć, Michał Polednia." reads stiff; the greeting carries the first name only.
+for (const step of LIFECYCLE_STEPS) {
+  const message = lifecycleMessage(step, { lang: "pl", displayName: "Michał Polednia", until, uid: "u", token: "t" });
+  check(`${step} greets by first name`, message.text.startsWith("Cześć, Michał.") && !message.text.includes("Polednia") && !message.html.includes("Polednia"));
+}
+const byAddress = lifecycleMessage("survey", { lang: "pl", displayName: "jan@example.com", until, uid: "u", token: "t" });
+check("an e-mail address in place of a name is not used as a name", byAddress.text.startsWith("Cześć. "));
+const spaced = lifecycleMessage("survey", { lang: "en", displayName: "  Anna   Maria Nowak ", until, uid: "u", token: "t" });
+check("extra spaces around the name are ignored", spaced.text.startsWith("Hello, Anna."));
+
+// On a phone the logo beside the text was wider than the screen and Gmail cut the right edge
+// of every line (owner's screenshots, 2026-10-12). The signature stacks: logo, then text.
+const stacked = lifecycleMessage("survey", { lang: "pl", displayName: "Michał", until, uid: "u", token: "t" }).html;
+check("signature stacks the logo above the text", !stacked.includes("border-left") && stacked.indexOf("liczmat-logo.png") < stacked.indexOf("Zespół LiczMat"));
+
 if (failures.length) {
   console.error(`\nlifecycle map: ${failures.length} FAILED, ${passed} passed\n`);
   for (const failure of failures) console.error(`  x ${failure}`);

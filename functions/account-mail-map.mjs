@@ -1,5 +1,5 @@
 /** Czysta logika wiadomosci konta i limitow wysylki. */
-import { escapeHtml, mailAction, mailLang, renderMail } from "./mail-map.mjs";
+import { escapeHtml, firstName, mailAction, mailLang, renderMail } from "./mail-map.mjs";
 
 export const ACCOUNT_MAIL_TYPES = Object.freeze(["verify", "reset", "change"]);
 export const LIMIT_WINDOW_MS = 60 * 60 * 1000;
@@ -95,8 +95,9 @@ function message(type, { lang, displayName, link, newEmail }) {
   const value = newEmail || "";
   const sentenceText = sentenceRaw.replace("{email}", value);
   const sentenceHtml = sentenceRaw.replace("{email}", escapeHtml(value));
-  const greetingText = type === "verify" ? `${tr.hello(displayName)}\n\n` : "";
-  const greetingHtml = type === "verify" ? `<p style="font-size: 16px; margin: 0 0 16px 0;">${tr.hello(escapeHtml(displayName))}</p>` : "";
+  const name = firstName(displayName);
+  const greetingText = type === "verify" ? `${tr.hello(name)}\n\n` : "";
+  const greetingHtml = type === "verify" ? `<p style="font-size: 16px; margin: 0 0 16px 0;">${tr.hello(escapeHtml(name))}</p>` : "";
   return renderMail({
     lang: code,
     subject,

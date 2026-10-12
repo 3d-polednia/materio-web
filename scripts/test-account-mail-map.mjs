@@ -40,6 +40,8 @@ for (const lang of MAIL_LANGS) {
 
 console.log("2. user values are escaped");
 {
+  const firstOnly = verifyEmail({ lang: "pl", displayName: "Michał Polednia", link });
+  check("verify greets by first name", firstOnly.text.includes("Michał") && !firstOnly.text.includes("Polednia"));
   const verify = verifyEmail({ lang: "pl", displayName: "<script>alert(1)</script>", link });
   const change = changeEmail({ lang: "pl", newEmail: "<script>@example.com", link });
   check("displayName escaped", verify.html.includes("&lt;script&gt;") && !verify.html.includes("<script>"));

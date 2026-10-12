@@ -7,7 +7,7 @@
  */
 
 import {
-  MAIL_FROM, MAIL_LANGS, MAIL_LOGO, MAIL_REPLY_TO, escapeHtml, renderMail
+  MAIL_FROM, MAIL_LANGS, MAIL_LOGO, MAIL_REPLY_TO, escapeHtml, firstName, renderMail
 } from "./mail-map.mjs";
 
 export const WELCOME_LANGS = MAIL_LANGS;
@@ -232,8 +232,9 @@ export function welcomeMessage({ lang, displayName }) {
   const urlCalc = URL_CALC_INDEX[code];
   const urlApp = "https://liczmat.com/app/";
   const urlPlay = "https://play.google.com/store/apps/details?id=pl.materio.app";
-  const greetingPlain = t.greeting(displayName);
-  const greetingHtml = t.greeting(escapeHtml(displayName));
+  const name = firstName(displayName);
+  const greetingPlain = t.greeting(name);
+  const greetingHtml = t.greeting(escapeHtml(name));
 
   const bodyText = `${greetingPlain}
 

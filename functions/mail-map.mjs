@@ -48,6 +48,17 @@ export function mailLang(lang) {
   return MAIL_LANGS.includes(code) ? code : "pl";
 }
 
+/**
+ * Samo imię do powitania: „Michał Polednia” daje „Michał” (właściciel, 2026-10-12:
+ * „Cześć, imię i nazwisko” brzmi sztywno). Adres e-mail w miejscu nazwy, który zdarza się
+ * przy rejestracji hasłem, nie jest imieniem, więc wtedy powitanie zostaje bez imienia.
+ */
+export function firstName(displayName) {
+  if (typeof displayName !== "string") return "";
+  const first = displayName.trim().split(/\s+/)[0] || "";
+  return first.includes("@") ? "" : first;
+}
+
 export function escapeHtml(value) {
   return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
     .replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;");
@@ -62,6 +73,10 @@ export function mailAction(label, link) {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; margin: 0 0 12px 0;"><tr><td bgcolor="#91d206" style="background-color: #91d206; padding: 12px 20px; border-radius: 8px;"><a href="${safeLink}" style="display: inline-block; color: #151B1E; font-weight: 700; text-decoration: underline;">${safeLabel}</a></td></tr></table><p style="font-size: 12px; margin: 0 0 24px 0; word-break: break-all;"><a href="${safeLink}" style="color: #0056b3; text-decoration: underline;">${safeLink}</a></p>`;
 }
 
+/**
+ * Podpis stoi w dwóch wierszach, logo nad tekstem. Logo obok tekstu było szersze niż ekran
+ * telefonu i Gmail ucinał prawą krawędź każdej linii maila (zrzuty właściciela, 2026-10-12).
+ */
 export function renderMail({ lang, subject, bodyHtml, bodyText }) {
   const code = mailLang(lang);
   const [team, role, privacy] = SIGNATURE[code];
@@ -72,7 +87,7 @@ export function renderMail({ lang, subject, bodyHtml, bodyText }) {
 <html lang="${code}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${escapeHtml(subject)}</title></head>
 <body style="margin: 0; padding: 24px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; color: #111111; line-height: 1.5;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;"><tr><td align="center"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; max-width: 560px;"><tr><td style="text-align: left;">${bodyHtml}
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; margin: 0 0 24px 0;"><tr><td style="padding: 0 16px 0 0; vertical-align: middle;"><a href="https://liczmat.com/" style="text-decoration: none;"><img src="${MAIL_LOGO}" width="162" height="54" alt="LiczMat" style="display: block; border: 0; outline: none;"></a></td><td style="padding: 0 0 0 16px; vertical-align: middle; border-left: 1px solid #dddddd; font-size: 14px; line-height: 1.5;"><strong style="font-size: 15px;">${team}</strong><br><span style="color: #555555;">LiczMat · ${role}</span><br><a href="https://liczmat.com/" style="color: #3d6b00; text-decoration: underline;">liczmat.com</a><span style="color: #999999;">&nbsp;·&nbsp;</span><a href="mailto:${MAIL_REPLY_TO}" style="color: #3d6b00; text-decoration: underline;">${MAIL_REPLY_TO}</a></td></tr></table>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; margin: 0 0 24px 0;"><tr><td style="padding: 0 0 12px 0;"><a href="https://liczmat.com/" style="text-decoration: none;"><img src="${MAIL_LOGO}" width="162" height="54" alt="LiczMat" style="display: block; border: 0; outline: none;"></a></td></tr><tr><td style="font-size: 14px; line-height: 1.5;"><strong style="font-size: 15px;">${team}</strong><br><span style="color: #555555;">LiczMat · ${role}</span><br><a href="https://liczmat.com/" style="color: #3d6b00; text-decoration: underline;">liczmat.com</a><span style="color: #999999;"> · </span><a href="mailto:${MAIL_REPLY_TO}" style="color: #3d6b00; text-decoration: underline;">${MAIL_REPLY_TO}</a></td></tr></table>
 <div style="font-size: 12px; color: #555555; border-top: 1px solid #eeeeee; padding-top: 16px;"><a href="${contactUrl}" style="color: #555555; text-decoration: underline;">Impressum</a><span>&nbsp;·&nbsp;</span><a href="${privacyUrl}" style="color: #555555; text-decoration: underline;">${privacy}</a></div>
 </td></tr></table></td></tr></table></body></html>`;
   return { subject, text, html };

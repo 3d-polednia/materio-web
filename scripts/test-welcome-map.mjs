@@ -122,6 +122,12 @@ head("3, 4, 6. welcomeMessage checks");
   }
 }
 
+head("5a. first name only");
+{
+  const msg = welcomeMessage({ lang: "pl", displayName: "Michał Polednia" });
+  check("welcome greets by first name", msg.text.startsWith("Cześć, Michał") && !msg.text.includes("Polednia") && !msg.html.includes("Polednia"));
+}
+
 /* 5. displayName escaping */
 head("5. displayName escaping");
 {
