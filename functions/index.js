@@ -56,6 +56,7 @@ import { createHash, createHmac, randomBytes } from "node:crypto";
 import * as functionsV1 from "firebase-functions/v1";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 import { defineSecret, defineString } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
@@ -73,6 +74,7 @@ import { looksLikeTicket, mintTicket, readTicket } from "./pay-ticket.mjs";
 import {
   WELCOME_FROM, WELCOME_REPLY_TO, welcomeDecision, welcomeLang, welcomeMarkerDoc, welcomeMessage,
 } from "./welcome-map.mjs";
+import { mailLang } from "./mail-map.mjs";
 import {
   IP_LIMIT, TARGET_LIMIT, changeEmail, limitDecision, parseAccountMail, resetPassword, verifyEmail,
 } from "./account-mail-map.mjs";
@@ -81,6 +83,10 @@ import {
   trialDecision, trialGrantDoc,
 } from "./trial-map.mjs";
 import { buildIcs, looksLikeFeedToken } from "./calendar-ics.mjs";
+import {
+  DAY, LIFECYCLE_STEPS, lifecycleDecision, lifecycleMessage, newMailToken, parseSurveyAnswer,
+  tokenMatches,
+} from "./lifecycle-map.mjs";
 
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
 
@@ -117,6 +123,7 @@ const SMTP_PASSWORD = defineSecret("SMTP_PASSWORD");
  */
 const STRIPE_PRICE_IDS = defineString("STRIPE_PRICE_IDS", { default: "" });
 const STRIPE_LIVE_MODE = defineString("STRIPE_LIVE_MODE", { default: "true" });
+const LIFECYCLE_LIVE = defineString("LIFECYCLE_LIVE", { default: "false" });
 
 const stripeConfig = () => ({
   allowedIds: STRIPE_PRICE_IDS.value(),
@@ -129,13 +136,13 @@ initializeApp();
 const REGION = "europe-central2";
 
 /** Wspolny transport skrzynki OVH dla wszystkich wiadomosci konta. */
-async function sendMail({ to, subject, text, html }) {
+async function sendMail({ to, subject, text, html, headers }) {
   const transporter = nodemailer.createTransport({
     host: "ssl0.ovh.net", port: 465, secure: true,
     auth: { user: WELCOME_REPLY_TO, pass: SMTP_PASSWORD.value() }
   });
   await transporter.sendMail({
-    from: WELCOME_FROM, replyTo: WELCOME_REPLY_TO, to, subject, text, html
+    from: WELCOME_FROM, replyTo: WELCOME_REPLY_TO, to, subject, text, html, headers
   });
 }
 
@@ -959,4 +966,175 @@ export const welcomeMail = onDocumentCreated(
       logger.error("welcome: blad", { uid, message: errorMsg });
     }
   }
+);
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Wiadomości okresu próbnego, ankieta i preferencje
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const MAIL_CORS = [
+  "https://liczmat.com", "https://www.liczmat.com", /^http:\/\/localhost(:\d+)?$/,
+];
+
+/** Codzienny przegląd triali. Tryb domyślny tylko opisuje planowaną wysyłkę w logu. */
+export const lifecycleMails = onSchedule(
+  { schedule: "0 10 * * *", timeZone: "Europe/Warsaw", region: REGION, secrets: [SMTP_PASSWORD] },
+  async () => {
+    const db = getFirestore();
+    const auth = getAuth();
+    const now = Date.now();
+    const grants = await db.collection("trialGrants").where("grantedAt", ">=", now - 16 * DAY).get();
+    for (const grantSnap of grants.docs) {
+      const uid = grantSnap.id;
+      try {
+        const stateRef = db.collection("lifecycleMails").doc(uid);
+        const [profileSnap, prefsSnap, stateSnap, user] = await Promise.all([
+          db.collection("users").doc(uid).get(), db.collection("mailPrefs").doc(uid).get(),
+          stateRef.get(), auth.getUser(uid),
+        ]);
+        const profile = profileSnap.exists ? profileSnap.data() : null;
+        const decision = lifecycleDecision({
+          grant: grantSnap.data(), profile, prefs: prefsSnap.exists ? prefsSnap.data() : null,
+          state: stateSnap.exists ? stateSnap.data() : null, email: user.email,
+          disabled: user.disabled, now,
+        });
+        if (!decision.send) continue;
+        if (LIFECYCLE_LIVE.value() !== "true") {
+          logger.info("lifecycle: dry-run", { uid, step: decision.send });
+          continue;
+        }
+        const step = decision.send;
+        const claim = await db.runTransaction(async (transaction) => {
+          const fresh = await transaction.get(stateRef);
+          const state = fresh.exists ? fresh.data() : {};
+          const current = state.steps && state.steps[step] && state.steps[step].status;
+          if (["sending", "sent", "failed", "skipped"].includes(current)) return null;
+          const token = typeof state.token === "string" ? state.token : newMailToken(randomBytes);
+          const steps = {};
+          for (const skipped of decision.skip) steps[skipped] = { status: "skipped", at: now };
+          steps[step] = { status: "sending", at: now };
+          transaction.set(stateRef, { uid, token, steps, updatedAt: now }, { merge: true });
+          return token;
+        });
+        if (!claim) continue;
+        try {
+          const message = lifecycleMessage(step, {
+            lang: profile && profile.lang, displayName: user.displayName,
+            until: profile && profile.planValidUntil || grantSnap.get("until") || grantSnap.get("grantedAt") + 14 * DAY,
+            uid, token: claim,
+          });
+          await sendMail({ to: user.email, ...message });
+          await stateRef.set({ steps: { [step]: { status: "sent", at: Date.now() } }, updatedAt: Date.now() }, { merge: true });
+          logger.info("lifecycle: wyslano", { uid, step });
+        } catch (error) {
+          const message = String(error && error.message || error).substring(0, 300);
+          await stateRef.set({ steps: { [step]: { status: "failed", at: Date.now(), error: message } }, updatedAt: Date.now() }, { merge: true }).catch(() => {});
+          logger.error("lifecycle: blad wysylki", { uid, step, message });
+        }
+      } catch (error) {
+        logger.error("lifecycle: blad konta", { uid, message: String(error && error.message || error).substring(0, 300) });
+      }
+    }
+  },
+);
+
+/** Publiczny cel przycisków ankiety i wypisania. GET nigdy niczego nie zapisuje. */
+export const mailLink = onRequest(
+  { region: REGION, cors: MAIL_CORS, maxInstances: 10 },
+  async (req, res) => {
+    if (req.method !== "POST") { res.status(405).json({ ok: false }); return; }
+    const formOneClick = String(req.get("List-Unsubscribe") || "") === "One-Click"
+      || String(req.body && req.body["List-Unsubscribe"] || "") === "One-Click";
+    const input = formOneClick ? { ...req.query, a: "unsub" } : (req.body || {});
+    const { a, u, t } = input;
+    if (typeof u !== "string" || typeof t !== "string" || !["rate", "answer", "unsub"].includes(a)) {
+      res.status(400).json({ ok: false }); return;
+    }
+    const db = getFirestore();
+    const stateSnap = await db.collection("lifecycleMails").doc(u).get();
+    if (!stateSnap.exists || !tokenMatches(stateSnap.get("token"), t)) {
+      res.status(404).json({ ok: false }); return;
+    }
+    const now = Date.now();
+    if (a === "rate") {
+      const rating = Number(input.r);
+      if (!Number.isInteger(rating) || rating < 1 || rating > 5) { res.status(400).json({ ok: false }); return; }
+      const profile = await db.collection("users").doc(u).get();
+      await db.collection("surveys").doc(u).set({ rating, ratedAt: now, lang: profile.exists && profile.get("lang") || "pl" }, { merge: true });
+    } else if (a === "answer") {
+      const answer = parseSurveyAnswer(input);
+      if (!answer.ok) {
+        res.status(400).json({ ok: false }); return;
+      }
+      await db.collection("surveys").doc(u).set({ use: answer.use, missing: answer.missing, answeredAt: now }, { merge: true });
+    } else {
+      await db.collection("mailPrefs").doc(u).set({ optOut: true, updatedAt: now, source: "link" }, { merge: true });
+    }
+    res.status(200).json({ ok: true });
+  },
+);
+
+/** Preferencja wiadomości dostępna wyłącznie właścicielowi zalogowanego konta. */
+export const mailPrefs = onCall(
+  { region: REGION, cors: MAIL_CORS, maxInstances: 10 },
+  async (request) => {
+    if (!request.auth || !request.auth.uid) throw new HttpsError("unauthenticated", "sign-in-required");
+    const action = request.data && request.data.action;
+    const ref = getFirestore().collection("mailPrefs").doc(request.auth.uid);
+    if (action === "get") {
+      const snap = await ref.get();
+      return { optOut: Boolean(snap.exists && snap.get("optOut") === true) };
+    }
+    if (action === "set" && typeof request.data.optOut === "boolean") {
+      await ref.set({ optOut: request.data.optOut, updatedAt: Date.now(), source: "account" }, { merge: true });
+      return { optOut: request.data.optOut };
+    }
+    throw new HttpsError("invalid-argument", "bad-action");
+  },
+);
+
+/** Podgląd wiadomości i ostatnie odpowiedzi ankietowe dla panelu administratora. */
+export const adminMail = onCall(
+  { region: REGION, cors: MAIL_CORS, secrets: [SMTP_PASSWORD], maxInstances: 5 },
+  async (request) => {
+    if (!request.auth || !isAdmin(request.auth.token)) throw new HttpsError("permission-denied", "not-admin");
+    const action = request.data && request.data.action;
+    const db = getFirestore();
+    const auth = getAuth();
+    if (action === "preview") {
+      const lang = mailLang(request.data && request.data.lang);
+      const user = await auth.getUser(request.auth.uid);
+      if (!user.email) throw new HttpsError("failed-precondition", "no-email");
+      const ref = db.collection("lifecycleMails").doc(request.auth.uid);
+      const token = await db.runTransaction(async (transaction) => {
+        const snap = await transaction.get(ref);
+        if (snap.exists && typeof snap.get("token") === "string") return snap.get("token");
+        const created = newMailToken(randomBytes);
+        transaction.set(ref, { uid: request.auth.uid, token: created, updatedAt: Date.now() }, { merge: true });
+        return created;
+      });
+      const until = Date.now() + 3 * DAY;
+      for (const step of LIFECYCLE_STEPS) {
+        const message = lifecycleMessage(step, { lang, displayName: user.displayName, until, uid: user.uid, token });
+        await sendMail({ to: user.email, ...message, subject: `[podgląd] ${message.subject}` });
+      }
+      return { ok: true };
+    }
+    if (action === "surveys") {
+      const surveys = await db.collection("surveys").orderBy("ratedAt", "desc").limit(200).get();
+      const rows = await Promise.all(surveys.docs.map(async (snap) => {
+        const data = snap.data();
+        let email = "";
+        try { email = (await auth.getUser(snap.id)).email || ""; } catch (_) {}
+        return { email, rating: data.rating || null, use: data.use || "", missing: data.missing || "", ratedAt: data.ratedAt || null, answeredAt: data.answeredAt || null, lang: data.lang || "pl" };
+      }));
+      const counts = {};
+      for (const step of LIFECYCLE_STEPS) {
+        const result = await db.collection("lifecycleMails").where(`steps.${step}.status`, "==", "sent").count().get();
+        counts[step] = result.data().count;
+      }
+      return { rows, counts };
+    }
+    throw new HttpsError("invalid-argument", "bad-action");
+  },
 );
