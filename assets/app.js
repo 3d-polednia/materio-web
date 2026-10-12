@@ -1281,7 +1281,14 @@ async function maybeMountAdmin(user) {
   try {
     const token = await user.getIdTokenResult(true);
     if (!token || !token.claims || token.claims[ADMIN_CLAIM] !== true) return;
-    const mod = await import("./admin.js");
+    // The panel carries this file's own `?v=` stamp. Imported bare, a browser kept the
+    // admin panel from before a deploy for an hour, and Ctrl+Shift+R did not help: a hard
+    // reload refetches what the page loads, not what it imports later (owner, 2026-10-12).
+    // Read from the page's own script tag rather than import.meta, which the security suite
+    // cannot evaluate (it loads this file as a plain script).
+    const appTag = document.querySelector('script[type="module"][src*="/assets/app"]');
+    const stamp = appTag ? new URL(appTag.src, location.href).search : "";
+    const mod = await import(`./admin.js${stamp}`);
     await mod.mountAdmin({ app: state.fbApp });
   } catch (e) {
     // No claim, no network, or the module failed to load: /app/ is unaffected. The panel
