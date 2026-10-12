@@ -110,7 +110,7 @@ function errorText(err) {
 const PANEL = `
   <h2>Panel administratora</h2>
   <p class="muted">Nadaje i odbiera LiczMat Pro po adresie e-mail. Zapis wykonuje funkcja
-    <code>adminPlan</code> w chmurze — ta strona o niczym nie decyduje i sama nic nie
+    <code>adminPlan</code> w chmurze. Ta strona o niczym nie decyduje i sama nic nie
     zapisuje. Panel jest po polsku, bo jest narzędziem, a nie stroną dla odwiedzającego.</p>
 
   <div class="app-card">
@@ -157,13 +157,13 @@ const PANEL = `
       <div class="field">
         <label for="admin-mail-lang">Język podglądu</label>
         <select id="admin-mail-lang">
-          <option value="pl">pl</option><option value="en">en</option>
-          <option value="de">de</option><option value="uk">uk</option>
-          <option value="cs">cs</option><option value="sk">sk</option>
-          <option value="ro">ro</option><option value="hr">hr</option>
-          <option value="sr">sr</option><option value="it">it</option>
-          <option value="nl">nl</option><option value="es">es</option>
-          <option value="fr">fr</option>
+          <option value="pl">polski</option><option value="en">angielski</option>
+          <option value="de">niemiecki</option><option value="uk">ukraiński</option>
+          <option value="cs">czeski</option><option value="sk">słowacki</option>
+          <option value="ro">rumuński</option><option value="hr">chorwacki</option>
+          <option value="sr">serbski</option><option value="it">włoski</option>
+          <option value="nl">niderlandzki</option><option value="es">hiszpański</option>
+          <option value="fr">francuski</option>
         </select>
       </div>
       <button type="button" id="admin-mail-preview" class="btn btn-ghost btn-sm">Wyślij podgląd</button>
@@ -185,7 +185,7 @@ const PANEL = `
   <div class="app-card">
     <h3>Wszystkie konta</h3>
     <p class="muted">Adres, logowanie, aktywność, profil i plan. Kliknij adres, żeby zobaczyć
-      szczegóły. Lista jest czytana na żądanie — nic się nie odświeża samo.</p>
+      szczegóły. Lista jest czytana na żądanie, nic się nie odświeża samo.</p>
     <p class="ws-links">
       <button type="button" id="admin-list" class="btn btn-ghost btn-sm">Wypisz konta</button>
     </p>

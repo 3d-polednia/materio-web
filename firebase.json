@@ -79,6 +79,15 @@
               "value": "public, max-age=3600"
             }
           ]
+        },
+        {
+          "source": "/assets/@(admin|account-sync|firebase-config).js",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
         }
       ]
     }
