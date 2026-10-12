@@ -95,6 +95,9 @@ function errorText(err) {
     "bad-email": "To nie wygląda na adres e-mail.",
     "bad-months": "Liczba miesięcy ma być całkowita, od 1 do 120.",
     "bad-action": "Nieznane polecenie.",
+    "no-steps": "Zaznacz przynajmniej jeden mail.",
+    "bad-step": "Nieznany rodzaj maila.",
+    "bad-request": "Niepełne polecenie.",
   };
   if (map[code]) return map[code];
   if (err && err.code === "functions/unauthenticated") return map["not-admin"];
@@ -136,6 +139,20 @@ const PANEL = `
 
   <div class="app-card" id="admin-mail">
     <h3>Maile i ankiety</h3>
+    <p class="muted">Podgląd maili okresu próbnego. Bez adresu idzie na Twój. Linki w podglądzie
+      działają, ale ocena i wypisanie trafiają na wspólne konto podglądu, nie na Twoje.</p>
+    <div class="field">
+      <label for="admin-mail-to">Adres odbiorcy</label>
+      <input id="admin-mail-to" type="email" autocomplete="off" maxlength="254"
+        placeholder="Twój adres">
+    </div>
+    <fieldset class="field admin-mail-steps">
+      <legend class="fld-label">Które maile</legend>
+      <label><input type="checkbox" id="admin-mail-all" checked> Zaznacz wszystkie</label>
+      <label><input type="checkbox" name="admin-mail-step" value="survey" checked> Ankieta (dzień 3)</label>
+      <label><input type="checkbox" name="admin-mail-step" value="tips" checked> Porady (dzień 7)</label>
+      <label><input type="checkbox" name="admin-mail-step" value="reminder" checked> Przypomnienie (dzień przed końcem)</label>
+    </fieldset>
     <div class="inline-form">
       <div class="field">
         <label for="admin-mail-lang">Język podglądu</label>
@@ -149,7 +166,7 @@ const PANEL = `
           <option value="fr">fr</option>
         </select>
       </div>
-      <button type="button" id="admin-mail-preview" class="btn btn-ghost btn-sm">Wyślij mi podgląd</button>
+      <button type="button" id="admin-mail-preview" class="btn btn-ghost btn-sm">Wyślij podgląd</button>
     </div>
     <p id="admin-mail-result" class="result show" role="status" aria-live="polite" hidden></p>
     <dl class="facts" id="admin-mail-counts">
@@ -311,13 +328,40 @@ export async function mountAdmin({ app }) {
     }
   }
 
+  const stepBoxes = () => [...document.querySelectorAll('input[name="admin-mail-step"]')];
+  const chosenSteps = () => stepBoxes().filter((box) => box.checked).map((box) => box.value);
+
+  // "Zaznacz wszystkie" follows the three boxes: ticked when all are, half-ticked when some are.
+  function syncAllBox() {
+    const chosen = chosenSteps().length;
+    const all = $("admin-mail-all");
+    all.checked = chosen === stepBoxes().length;
+    all.indeterminate = chosen > 0 && chosen < stepBoxes().length;
+  }
+  $("admin-mail-all").addEventListener("change", (event) => {
+    for (const box of stepBoxes()) box.checked = event.currentTarget.checked;
+    syncAllBox();
+  });
+  for (const box of stepBoxes()) box.addEventListener("change", syncAllBox);
+
   $("admin-mail-preview").addEventListener("click", async () => {
+    const steps = chosenSteps();
+    if (!steps.length) {
+      sayMail("Zaznacz przynajmniej jeden mail.", true);
+      return;
+    }
     const button = $("admin-mail-preview");
     button.disabled = true;
     sayMail("Wysyłanie...");
     try {
-      await mailCallable({ action: "preview", lang: $("admin-mail-lang").value });
-      sayMail("Wysłano na Twój adres");
+      const response = await mailCallable({
+        action: "preview", lang: $("admin-mail-lang").value,
+        to: $("admin-mail-to").value.trim(), steps,
+      });
+      const data = response && response.data ? response.data : {};
+      const count = Number(data.sent) || steps.length;
+      const word = count === 1 ? "mail" : "maile";
+      sayMail(`Wysłano ${count} ${word} na ${data.to || "Twój adres"}`);
     } catch (error) {
       sayMail(errorText(error), true);
     } finally {

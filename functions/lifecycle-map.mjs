@@ -54,6 +54,28 @@ export function parseSurveyAnswer(input) {
   if (missing.length > 1000 || (!useText && !missing)) return { ok: false };
   return { ok: true, use: useText || null, missing };
 }
+const PREVIEW_ADDRESS = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/;
+
+/**
+ * Podgląd z panelu admina (właściciel, 2026-10-12): dowolny jeden adres, dowolny podzbiór
+ * trzech maili. Bez adresu podgląd idzie do samego admina. Kroki wracają bez powtórzeń,
+ * w kolejności LIFECYCLE_STEPS, żeby skrzynka pokazała je tak, jak dostanie je użytkownik.
+ */
+export function parsePreviewRequest(data, adminEmail) {
+  if (!data || typeof data !== "object") return { ok: false, error: "bad-request" };
+  if (!Array.isArray(data.steps)) return { ok: false, error: "no-steps" };
+  if (data.steps.some((step) => !LIFECYCLE_STEPS.includes(step))) return { ok: false, error: "bad-step" };
+  const steps = LIFECYCLE_STEPS.filter((step) => data.steps.includes(step));
+  if (!steps.length) return { ok: false, error: "no-steps" };
+
+  const typed = typeof data.to === "string" ? data.to.trim().toLowerCase() : "";
+  const to = typed || adminEmail;
+  if (typeof to !== "string" || to.length > 254 || !PREVIEW_ADDRESS.test(to)) {
+    return { ok: false, error: "bad-email" };
+  }
+  return { ok: true, to, steps, lang: mailLang(data.lang) };
+}
+
 export function mailPageUrl(lang, params) {
   const code = mailLang(lang);
   return `https://liczmat.com${code === "pl" ? "" : `/${code}`}/maile/?${new URLSearchParams(params)}`;

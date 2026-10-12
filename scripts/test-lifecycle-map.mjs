@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   DAY, LIFECYCLE_STEPS, MAIL_LINK_URL, lifecycleDecision, lifecycleMessage,
-  lifecycleStart, mailPageUrl, newMailToken, parseSurveyAnswer, tokenMatches,
+  lifecycleStart, mailPageUrl, newMailToken, parsePreviewRequest, parseSurveyAnswer, tokenMatches,
 } from "../functions/lifecycle-map.mjs";
 import { MAIL_LANGS, escapeHtml } from "../functions/mail-map.mjs";
 
@@ -120,6 +120,24 @@ check("extra spaces around the name are ignored", spaced.text.startsWith("Hello,
 // of every line (owner's screenshots, 2026-10-12). The signature stacks: logo, then text.
 const stacked = lifecycleMessage("survey", { lang: "pl", displayName: "Michał", until, uid: "u", token: "t" }).html;
 check("signature stacks the logo above the text", !stacked.includes("border-left") && stacked.indexOf("liczmat-logo.png") < stacked.indexOf("Zespół LiczMat"));
+
+// The admin preview (owner, 2026-10-12): any address, any subset of the three e-mails.
+{
+  const admin = "admin@example.com";
+  const all = parsePreviewRequest({ lang: "de", steps: ["survey", "tips", "reminder"] }, admin);
+  check("preview without an address goes to the admin", all.ok && all.to === admin && all.lang === "de" && all.steps.join() === "survey,tips,reminder");
+  const one = parsePreviewRequest({ to: "  Kolega@Firma.pl ", steps: ["tips"] }, admin);
+  check("preview to another address, one e-mail", one.ok && one.to === "kolega@firma.pl" && one.steps.join() === "tips");
+  const ordered = parsePreviewRequest({ steps: ["reminder", "survey", "survey"] }, admin);
+  check("steps are deduplicated and sent in their order", ordered.ok && ordered.steps.join() === "survey,reminder");
+  check("no step chosen is refused", parsePreviewRequest({ steps: [] }, admin).ok === false);
+  check("an unknown step is refused", parsePreviewRequest({ steps: ["spam"] }, admin).ok === false);
+  check("a malformed address is refused", parsePreviewRequest({ to: "nie-adres", steps: ["tips"] }, admin).ok === false);
+  check("two addresses at once are refused", parsePreviewRequest({ to: "a@b.pl, c@d.pl", steps: ["tips"] }, admin).ok === false);
+  check("an over-long address is refused", parsePreviewRequest({ to: "a".repeat(250) + "@b.pl", steps: ["tips"] }, admin).ok === false);
+  check("no data at all is refused", parsePreviewRequest(null, admin).ok === false);
+  check("an unknown language falls back to pl", parsePreviewRequest({ lang: "xx", steps: ["tips"] }, admin).lang === "pl");
+}
 
 if (failures.length) {
   console.error(`\nlifecycle map: ${failures.length} FAILED, ${passed} passed\n`);

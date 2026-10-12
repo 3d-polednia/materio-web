@@ -2421,6 +2421,9 @@ border-color: var(--accent-edge);
 .mail-radio-group input { width: var(--sp-5); height: var(--sp-5); flex: none; accent-color: var(--accent-strong); }
 .mail-feedback-form textarea { width: 100%; resize: vertical; }
 .mail-thank-you { margin-top: var(--sp-5); }
+.admin-mail-steps { border: 0; padding: 0; margin-inline: 0; }
+.admin-mail-steps label { display: flex; align-items: center; gap: var(--sp-2); min-height: 44px; margin: 0; font-weight: normal; }
+.admin-mail-steps input { width: var(--sp-5); height: var(--sp-5); flex: none; accent-color: var(--accent-strong); }
 @media (max-width: 560px) {
 .mail-page-main .block { padding-block: var(--sp-6); }
 .mail-card { padding: var(--sp-5); }

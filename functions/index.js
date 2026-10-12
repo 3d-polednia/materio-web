@@ -84,7 +84,7 @@ import {
 } from "./trial-map.mjs";
 import { buildIcs, looksLikeFeedToken } from "./calendar-ics.mjs";
 import {
-  DAY, LIFECYCLE_STEPS, lifecycleDecision, lifecycleMessage, newMailToken, parseSurveyAnswer,
+  DAY, LIFECYCLE_STEPS, lifecycleDecision, lifecycleMessage, newMailToken, parsePreviewRequest, parseSurveyAnswer,
   tokenMatches,
 } from "./lifecycle-map.mjs";
 
@@ -972,6 +972,9 @@ export const welcomeMail = onDocumentCreated(
    Wiadomości okresu próbnego, ankieta i preferencje
    ══════════════════════════════════════════════════════════════════════════ */
 
+/** Wspólne pseudo-konto linków z podglądu (prawdziwy uid Firebase ma 28 znaków). */
+const PREVIEW_UID = "preview";
+
 const MAIL_CORS = [
   "https://liczmat.com", "https://www.liczmat.com", /^http:\/\/localhost(:\d+)?$/,
 ];
@@ -1102,30 +1105,40 @@ export const adminMail = onCall(
     const db = getFirestore();
     const auth = getAuth();
     if (action === "preview") {
-      const lang = mailLang(request.data && request.data.lang);
-      const user = await auth.getUser(request.auth.uid);
-      if (!user.email) throw new HttpsError("failed-precondition", "no-email");
-      const ref = db.collection("lifecycleMails").doc(request.auth.uid);
+      const admin = await auth.getUser(request.auth.uid);
+      const parsed = parsePreviewRequest(request.data, admin.email);
+      if (!parsed.ok) throw new HttpsError("invalid-argument", parsed.error);
+      // Linki podglądu niosą wspólny token konta "preview", nie admina: ocena czy wypisanie
+      // kliknięte przez kolegę, któremu wysłano podgląd, ląduje w surveys/preview
+      // i mailPrefs/preview, a nie na koncie admina ani w odpowiedziach prawdziwych osób.
+      const ref = db.collection("lifecycleMails").doc(PREVIEW_UID);
       const token = await db.runTransaction(async (transaction) => {
         const snap = await transaction.get(ref);
         if (snap.exists && typeof snap.get("token") === "string") return snap.get("token");
         const created = newMailToken(randomBytes);
-        transaction.set(ref, { uid: request.auth.uid, token: created, updatedAt: Date.now() }, { merge: true });
+        transaction.set(ref, { uid: PREVIEW_UID, token: created, updatedAt: Date.now() }, { merge: true });
         return created;
       });
+      // Imię admina tylko w podglądzie do niego samego; obcy adres dostaje powitanie bez imienia.
+      const displayName = parsed.to === String(admin.email || "").toLowerCase() ? admin.displayName : null;
       const until = Date.now() + 3 * DAY;
-      for (const step of LIFECYCLE_STEPS) {
-        const message = lifecycleMessage(step, { lang, displayName: user.displayName, until, uid: user.uid, token });
-        await sendMail({ to: user.email, ...message, subject: `[podgląd] ${message.subject}` });
+      for (const step of parsed.steps) {
+        const message = lifecycleMessage(step, { lang: parsed.lang, displayName, until, uid: PREVIEW_UID, token });
+        await sendMail({ to: parsed.to, ...message, subject: `[podgląd] ${message.subject}` });
       }
-      return { ok: true };
+      logger.info("adminMail: podglad", { by: request.auth.uid, steps: parsed.steps, lang: parsed.lang, own: displayName !== null });
+      return { ok: true, to: parsed.to, sent: parsed.steps.length };
     }
     if (action === "surveys") {
       const surveys = await db.collection("surveys").orderBy("ratedAt", "desc").limit(200).get();
       const rows = await Promise.all(surveys.docs.map(async (snap) => {
         const data = snap.data();
         let email = "";
-        try { email = (await auth.getUser(snap.id)).email || ""; } catch (_) {}
+        if (snap.id === PREVIEW_UID) {
+          email = "(podgląd)";
+        } else {
+          try { email = (await auth.getUser(snap.id)).email || ""; } catch (_) {}
+        }
         return { email, rating: data.rating || null, use: data.use || "", missing: data.missing || "", ratedAt: data.ratedAt || null, answeredAt: data.answeredAt || null, lang: data.lang || "pl" };
       }));
       const counts = {};
