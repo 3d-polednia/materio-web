@@ -935,12 +935,20 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
       companies: [], clients: [], jobs: [], quotes: [], materials: [], events: [],
     };
     const rows = (snap) => { const list = []; snap.forEach((d) => list.push({ id: d.id, ...d.data() })); return list; };
+    const read = (...path) => fb.getDocs(fb.collection(db, "users", uid, ...path));
 
+    // Every read is started at once. Until 2026-10-12 each one waited for the one before:
+    // 8 reads plus 2 per project, one round trip each, so an account with fifty projects
+    // sat on an empty page for over ten seconds in a fresh browser and looked deleted
+    // (owner, 2026-10-12). Now it is two round trips: the collections, then every
+    // project's children together. scripts/test-account-download.mjs holds it there.
     requireSyncUid(uid);
-    const projSnap = await fb.getDocs(fb.collection(db, "users", uid, "projects"));
-    out.projects = rows(projSnap);
-    requireSyncUid(uid);
-    out.rooms = rows(await fb.getDocs(fb.collection(db, "users", uid, "rooms")));
+    const projectsWithChildren = read("projects").then(async (projSnap) => {
+      const projects = rows(projSnap);
+      const children = await Promise.all(projects.map((project) =>
+        Promise.all([read("projects", project.id, "estimations"), read("projects", project.id, "shoppingItems")])));
+      return { projects, children };
+    });
     // The Pro collections (session 46). Flat, beside rooms, and downloaded even when
     // nothing on this page draws them: the export button hands back the whole account.
     //
@@ -953,25 +961,24 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     // fail open, in the direction of the visitor's own data.
     // Keep `jobs` for one release of tolerant reading. Remove it in the release after this
     // one, together with the phone's database migration from schema 9 to 10.
-    for (const name of ["companies", "clients", "jobs", "quotes", "materials", "events"]) {
-      try {
-        requireSyncUid(uid);
-        out[name] = rows(await fb.getDocs(fb.collection(db, "users", uid, name)));
-      } catch (err) {
-        if (!syncUidActive(uid)) throw err;
-        out[name] = [];
-      }
-    }
+    const PRO = ["companies", "clients", "jobs", "quotes", "materials", "events"];
+    const proReads = PRO.map((name) => read(name).then(rows, (err) => {
+      if (!syncUidActive(uid)) throw err;
+      return [];
+    }));
+    const [{ projects, children }, roomSnap, ...proRows] =
+      await Promise.all([projectsWithChildren, read("rooms"), ...proReads]);
+    // Nothing read for an account that is no longer the signed-in one is handed back.
+    requireSyncUid(uid);
 
-    for (const project of out.projects) {
-      const sub = (name) => fb.collection(db, "users", uid, "projects", project.id, name);
-      requireSyncUid(uid);
-      const est = rows(await fb.getDocs(sub("estimations"))).map((e) => ({ ...e, projectId: project.id }));
-      requireSyncUid(uid);
-      const shop = rows(await fb.getDocs(sub("shoppingItems"))).map((s) => ({ ...s, projectId: project.id }));
-      out.estimations.push(...est);
-      out.shoppingItems.push(...shop);
-    }
+    out.projects = projects;
+    out.rooms = rows(roomSnap);
+    PRO.forEach((name, i) => { out[name] = proRows[i]; });
+    projects.forEach((project, i) => {
+      const [estSnap, shopSnap] = children[i];
+      out.estimations.push(...rows(estSnap).map((e) => ({ ...e, projectId: project.id })));
+      out.shoppingItems.push(...rows(shopSnap).map((s) => ({ ...s, projectId: project.id })));
+    });
     return out;
   }
 
