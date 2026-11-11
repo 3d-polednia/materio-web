@@ -7,8 +7,8 @@
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, SECTION,
-  urlHome, urlAndroid, urlCookies, urlContact, urlPrivacy, ENTITY,
-  URL_PRIVACY, URL_APP, PLAY_URL,
+  urlHome, urlAndroid, urlCookies, urlContact, urlPrivacy, urlTerms, urlCancel, urlWithdraw, ENTITY,
+  URL_APP, PLAY_URL,
 } from "./site.mjs";
 import { FLAG, LANG_NAME } from "./flags.mjs";
 import { CURRENCIES, DEFAULT_CURRENCY } from "./currency.mjs";
@@ -594,7 +594,7 @@ export function siteFooter(f) {
       <span>© <span data-year>2026</span> LiczMat.${minimal ? "" : ` ${esc(t("foot_rights"))}`}</span>
       ${who}
       ${minimal
-        ? `<span><a href="${urlContact(DEFAULT_LANG)}"${inPlace ? ' data-i18n="foot_contact"' : ""}>${esc(t("foot_contact"))}</a> &middot; <a href="${URL_PRIVACY}"${inPlace ? ' data-i18n="foot_privacy"' : ""}>${esc(t("foot_privacy"))}</a></span>
+        ? `<span><a href="${urlContact(DEFAULT_LANG)}"${inPlace ? ' data-i18n="foot_contact" data-nav-route="contact"' : ""}>${esc(t("foot_contact"))}</a> &middot; <a href="${urlPrivacy(DEFAULT_LANG)}"${inPlace ? ' data-i18n="foot_privacy" data-nav-route="privacy"' : ""}>${esc(t("foot_privacy"))}</a> &middot; <a href="${urlTerms(DEFAULT_LANG)}"${inPlace ? ' data-i18n="foot_terms" data-nav-route="terms"' : ""}>${esc(t("foot_terms"))}</a> &middot; <a href="${urlCancel(DEFAULT_LANG)}"${inPlace ? ' data-i18n="foot_cancel" data-nav-route="cancel"' : ""}>${esc(t("foot_cancel"))}</a> &middot; <a href="${urlWithdraw(DEFAULT_LANG)}"${inPlace ? ' data-i18n="foot_withdraw" data-nav-route="withdraw"' : ""}>${esc(t("foot_withdraw"))}</a></span>
       <span class="muted"${inPlace ? ' data-i18n="app_noindex_note"' : ""}>${esc(t("app_noindex_note"))}</span>`
         : `<span>${esc(t("foot_disclaimer"))}</span>`}
     </div>`;
@@ -640,6 +640,9 @@ export function siteFooter(f) {
           <li><a href="${urlContact(lang)}">${esc(t("foot_contact"))}</a></li>
           <li><a href="${urlPrivacy(lang)}">${esc(t("foot_privacy"))}</a></li>
           <li><a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a></li>
+          <li><a href="${urlTerms(lang)}">${esc(t("foot_terms"))}</a></li>
+          <li><a href="${urlCancel(lang)}">${esc(t("foot_cancel"))}</a></li>
+          <li><a href="${urlWithdraw(lang)}">${esc(t("foot_withdraw"))}</a></li>
         </ul>
       </div>
     </div>

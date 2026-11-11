@@ -79,6 +79,10 @@ import {
   IP_LIMIT, TARGET_LIMIT, changeEmail, limitDecision, parseAccountMail, resetPassword, verifyEmail,
 } from "./account-mail-map.mjs";
 import {
+  customerMail, limitDecision as contractLimitDecision, ownerMail, validateNotice,
+} from "./contract-map.mjs";
+import { ENTITY } from "./site-entity.mjs";
+import {
   SERVER_PROFILE_DELAY_MS, TRIAL_DAYS, firstAppWrite, serverProfileDoc,
   trialDecision, trialGrantDoc,
 } from "./trial-map.mjs";
@@ -905,6 +909,144 @@ export const sendAccountMail = onCall(
     });
     return { ok: true };
   }
+);
+
+/** Calendar buckets in the seller's time zone, used by the contract notice limits. */
+function contractLimitBuckets(now) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", hourCycle: "h23",
+  }).formatToParts(new Date(now));
+  const pick = (type) => parts.find((part) => part.type === type)?.value || "";
+  const day = `${pick("year")}-${pick("month")}-${pick("day")}`;
+  return { day, hour: `${day}T${pick("hour")}` };
+}
+
+/** Read and increment both counters in one transaction. Counts returned to the decision
+ * are the values before this request, so 0, 1 and 2 still send a customer confirmation. */
+async function reserveContractNoticeLimit(db, email, ip, now) {
+  const emailHash = createHash("sha256").update(`email:${email}`).digest("hex");
+  const ipHash = createHash("sha256").update(`ip:${ip || "unknown"}`).digest("hex");
+  const emailRef = db.collection("contractNoticeLimits").doc(emailHash);
+  const ipRef = db.collection("contractNoticeLimits").doc(ipHash);
+  const bucket = contractLimitBuckets(now);
+
+  const decision = await db.runTransaction(async (tx) => {
+    const [emailSnap, ipSnap] = await Promise.all([tx.get(emailRef), tx.get(ipRef)]);
+    const emailData = emailSnap.exists ? emailSnap.data() : {};
+    const ipData = ipSnap.exists ? ipSnap.data() : {};
+    const emailToday = emailData.dayBucket === bucket.day ? Number(emailData.dayCount) || 0 : 0;
+    const ipHour = ipData.hourBucket === bucket.hour ? Number(ipData.hourCount) || 0 : 0;
+    const answer = contractLimitDecision({ emailToday, ipHour });
+
+    tx.set(emailRef, {
+      dayBucket: bucket.day, dayCount: emailToday + 1,
+      expiresAt: new Date(now + 2 * 24 * 60 * 60 * 1000),
+    });
+    tx.set(ipRef, {
+      hourBucket: bucket.hour, hourCount: ipHour + 1,
+      expiresAt: new Date(now + 2 * 60 * 60 * 1000),
+    });
+    return answer;
+  });
+
+  return { ...decision, emailHash, ipHash };
+}
+
+/** A cancellation or withdrawal remains valid without an account match. The address is
+ * only used to attach the current plan snapshot when Auth knows it. */
+async function contractNoticeAccount(email) {
+  let user;
+  try {
+    user = await getAuth().getUserByEmail(email);
+  } catch (error) {
+    if (error && error.code === "auth/user-not-found") return null;
+    throw error;
+  }
+
+  const profile = await getFirestore().collection("users").doc(user.uid).get();
+  const data = profile.exists ? profile.data() : {};
+  return {
+    uid: user.uid,
+    plan: data.plan ?? null,
+    planValidUntil: Number.isFinite(Number(data.planValidUntil)) ? Number(data.planValidUntil) : null,
+    planRenews: typeof data.planRenews === "boolean" ? data.planRenews : null,
+    planSource: data.planSource ?? null,
+  };
+}
+
+/** Store every valid contract notice, mail the owner every time, and cap only the
+ * customer confirmations. The legal effect does not depend on finding an account. */
+export const contractNotice = onCall(
+  { region: REGION, secrets: [SMTP_PASSWORD], maxInstances: 5 },
+  async (request) => {
+    const parsed = validateNotice(request.data);
+    if (!parsed.ok) throw new HttpsError("invalid-argument", parsed.error);
+
+    const notice = parsed.notice;
+    const receivedAtMs = Date.now();
+    const ip = String(request.rawRequest && request.rawRequest.ip || "unknown");
+    const db = getFirestore();
+    const [limit, account] = await Promise.all([
+      reserveContractNoticeLimit(db, notice.email, ip, receivedAtMs),
+      contractNoticeAccount(notice.email),
+    ]);
+    const plan = account ? {
+      plan: account.plan,
+      planValidUntil: account.planValidUntil,
+      planRenews: account.planRenews,
+      planSource: account.planSource,
+    } : null;
+    const ref = db.collection("contractNotices").doc();
+    await ref.set({
+      notice,
+      receivedAt: FieldValue.serverTimestamp(),
+      receivedAtMs,
+      uid: account ? account.uid : null,
+      plan,
+      emailHash: limit.emailHash,
+      ipHash: limit.ipHash,
+      mailedCustomer: false,
+    });
+
+    const sends = [];
+    const customerIndex = limit.mailCustomer ? sends.length : -1;
+    if (limit.mailCustomer) {
+      sends.push(sendMail({
+        to: notice.email,
+        ...customerMail(notice, receivedAtMs, account && account.planValidUntil),
+      }));
+    }
+    const ownerIndex = sends.length;
+    sends.push(sendMail({ to: ENTITY.email, ...ownerMail(notice, receivedAtMs, account) }));
+    const results = await Promise.allSettled(sends);
+
+    if (customerIndex >= 0 && results[customerIndex].status === "fulfilled") {
+      await ref.set({ mailedCustomer: true }, { merge: true });
+    }
+    if (customerIndex >= 0 && results[customerIndex].status === "rejected") {
+      logger.error("contract-notice: customer mail failed", {
+        id: ref.id, emailHash: limit.emailHash.slice(0, 16),
+        message: String(results[customerIndex].reason && results[customerIndex].reason.message || results[customerIndex].reason).slice(0, 300),
+      });
+    }
+    if (results[ownerIndex].status === "rejected") {
+      logger.error("contract-notice: owner mail failed", {
+        id: ref.id,
+        message: String(results[ownerIndex].reason && results[ownerIndex].reason.message || results[ownerIndex].reason).slice(0, 300),
+      });
+      throw new HttpsError("internal", "owner-mail");
+    }
+    if (customerIndex >= 0 && results[customerIndex].status === "rejected") {
+      throw new HttpsError("internal", "customer-mail");
+    }
+
+    logger.info("contract-notice: stored", {
+      id: ref.id, kind: notice.kind, uid: account && account.uid,
+      mailedCustomer: limit.mailCustomer && results[customerIndex].status === "fulfilled",
+    });
+    return { receivedAt: receivedAtMs };
+  },
 );
 
 /**

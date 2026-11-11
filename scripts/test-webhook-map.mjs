@@ -389,8 +389,14 @@ head("8. the function is deployed, not published — and carries no secret");
   for (const path of ["functions", "firebase.json", ".firebaserc"]) {
     check(`${path} is dropped from the published site`, dropped.split(/\s+/).includes(path), dropped);
   }
+  /* 2026-11-11: the build WRITES one generated file into functions/ (site-entity.mjs, the
+     seller data the contract and welcome mails sign with, since functions/ is deployed as its
+     own tree and cannot import src/site.mjs). It still never reads anything from there. */
+  const build = read("scripts/build.mjs");
   check("the generator does not read functions/",
-    !read("scripts/build.mjs").includes("functions/"));
+    build.replace(/write\("functions\/site-entity\.mjs"/g, "").split("\n")
+      .filter((line) => line.includes("functions/") && !/^\s*(\/\*|\*|\/\/)/.test(line)).length === 0,
+    "build.mjs touches functions/ beyond writing site-entity.mjs");
 
   /* One secret, and it is fetched at runtime rather than written down. */
   check("the webhook secret is a Secret Manager parameter",

@@ -152,6 +152,18 @@ privacy: {
     pl: "polityka-prywatnosci", uk: "polityka-konfidentsiinosti", de: "datenschutz", en: "privacy-policy",
     cs: "ochrana-osobnich-udaju", sk: "ochrana-osobnych-udajov", ro: "politica-de-confidentialitate", hr: "pravila-privatnosti", sr: "politika-privatnosti", it: "informativa-privacy", nl: "privacybeleid", es: "politica-de-privacidad", fr: "politique-de-confidentialite",
   },
+terms: {
+    pl: "regulamin", uk: "umovy", de: "agb", en: "terms",
+    cs: "obchodni-podminky", sk: "obchodne-podmienky", ro: "termeni-si-conditii", hr: "uvjeti-koristenja", sr: "uslovi-koriscenja", it: "termini-e-condizioni", nl: "voorwaarden", es: "condiciones", fr: "conditions-generales",
+  },
+cancel: {
+    pl: "wypowiedz-umowe", uk: "rozirvaty-dohovir", de: "vertraege-kuendigen", en: "cancel-contract",
+    cs: "vypovedet-smlouvu", sk: "vypovedat-zmluvu", ro: "reziliere-contract", hr: "raskid-ugovora", sr: "raskid-ugovora", it: "disdici-contratto", nl: "contract-opzeggen", es: "cancelar-contrato", fr: "resilier-contrat",
+  },
+withdraw: {
+    pl: "odstap-od-umowy", uk: "vidmova-vid-dohovoru", de: "vertrag-widerrufen", en: "withdraw-from-contract",
+    cs: "odstoupit-od-smlouvy", sk: "odstupit-od-zmluvy", ro: "retragere-din-contract", hr: "odustanak-od-ugovora", sr: "odustanak-od-ugovora", it: "recesso-dal-contratto", nl: "herroeping", es: "desistimiento", fr: "retractation",
+  },
 estimate: {
     pl: "kosztorys", uk: "koshtorys", de: "kostenvoranschlag", en: "cost-estimate",
     cs: "rozpocet", sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun", it: "preventivo", nl: "kostenraming", es: "presupuesto", fr: "devis",
@@ -456,6 +468,11 @@ export const urlContact = (lang) => `${prefix(lang)}/${SECTION.contact[lang]}/`;
 
 /** The full privacy policy in the language of the page. */
 export const urlPrivacy = (lang) => `${prefix(lang)}/${SECTION.privacy[lang]}/`;
+
+/** The LiczMat Pro terms and the two contract notice forms. */
+export const urlTerms = (lang) => `${prefix(lang)}/${SECTION.terms[lang]}/`;
+export const urlCancel = (lang) => `${prefix(lang)}/${SECTION.cancel[lang]}/`;
+export const urlWithdraw = (lang) => `${prefix(lang)}/${SECTION.withdraw[lang]}/`;
 
 /**
  * Who runs LiczMat. The one place the operator identity is written down.

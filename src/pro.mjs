@@ -21,7 +21,7 @@
 
 import { esc } from "./template.mjs";
 import { LEVEL, STATUS, route } from "./ia.mjs";
-import { DEFAULT_LANG, URL_APP } from "./site.mjs";
+import { DEFAULT_LANG, URL_APP, urlTerms } from "./site.mjs";
 
 /**
  * The Pro modules, in the order the master plan builds them (chapter XXXII).
@@ -52,6 +52,7 @@ export const proKeys = (features) => [
   // Session 28, the subscription: the two plans, the way to the checkout, and the four
   // sentences the account page needs for the states a plan can be in.
   "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_buy_monthly", "pay_buy_yearly", "pay_go", "pay_monthly_t", "pay_monthly_per",
+  "pay_terms", "pay_terms_link",
   "pay_yearly_t", "pay_yearly_per", "pay_manage", "pay_manage_d",
   "plan_renews", "plan_cancelled", "plan_cancel_d", "plan_active_d",
   ...proModules(features).flatMap((f) => [`${f.key}_t`, `${f.key}_d`]),
@@ -105,6 +106,18 @@ export function proMoreLink(t, lang) {
   return `<span class="muted"><span data-i18n="pro_more">${esc(t("pro_more"))}</span>. <span data-i18n="door_soon">${esc(t("door_soon"))}</span></span>`;
 }
 
+/** The plain terms sentence below a way to buy. The placeholder lets the linked words
+ * follow each language's grammar without putting HTML in the dictionary. */
+export function proTermsLine(t, lang = DEFAULT_LANG, inPlace = false) {
+  const template = String(t("pay_terms"));
+  const marker = "{terms}";
+  const at = template.indexOf(marker);
+  const before = at >= 0 ? template.slice(0, at) : template;
+  const after = at >= 0 ? template.slice(at + marker.length) : "";
+  const route = inPlace ? ' data-nav-route="terms"' : "";
+  return `<p class="muted field-note pay-terms" data-i18n-template="pay_terms">${esc(before)}<a href="${urlTerms(lang)}"${route} data-i18n-template-link="pay_terms_link">${esc(t("pay_terms_link"))}</a>${esc(after)}</p>`;
+}
+
 /**
  * What LiczMat Pro costs — the two plans, side by side.
  *
@@ -137,6 +150,8 @@ export function proMoreLink(t, lang) {
 export function proPlansBlock(t, opts) {
   const checkout = Boolean(opts && opts.checkout);
   const prices = (opts && opts.prices) || null;
+  const lang = (opts && opts.lang) || DEFAULT_LANG;
+  const inPlace = Boolean(opts && opts.inPlace);
   const plan = (id) => {
     const price = prices ? prices[id] : "";
     const buy = checkout
@@ -170,7 +185,7 @@ export function proPlansBlock(t, opts) {
             ${plan("monthly")}
             ${plan("yearly")}
           </div>
-          <p data-pw-buy hidden>${go}</p>
+          <div data-pw-buy hidden>${go ? `<p>${go}</p>` : ""}${proTermsLine(t, lang, inPlace)}</div>
           <p class="muted" data-pw-soon data-i18n="pay_soon">${esc(t("pay_soon"))}</p>
         </div>`;
 }
@@ -245,7 +260,7 @@ export function proGate(t, featureId, features, lang, opts) {
             ${others}
           </ul>
         </div>`;
-  const plans = brief ? "" : proPlansBlock(t, { checkout: false });
+  const plans = brief ? "" : proPlansBlock(t, { checkout: false, lang });
 
   // The wall needs data-i18n on every string, even though the build writes it once per
   // language: /app/ is a single page, so a visitor switching language repaints only
@@ -343,7 +358,7 @@ export function proPanel(t, features) {
            stays hidden until assets/pay.js carries a Payment Link — see the ORDER note
            at the bottom of that file. -->
       <div id="plan-buy">
-      ${proPlansBlock(t, { checkout: true })}
+      ${proPlansBlock(t, { checkout: true, lang: DEFAULT_LANG, inPlace: true })}
       </div>
 
       ${i("pro_pay_later", "p", "muted src-note")}`;

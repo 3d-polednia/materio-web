@@ -221,6 +221,22 @@ function applyLang(lang) {
   const l = I18N[lang] ? lang : pageLang();
   document.documentElement.lang = l;
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n, l); });
+  /* One translated sentence contains one link. Keeping the placeholder in plain copy
+     avoids trusted HTML in the dictionary and keeps the link alive across /app/ switches. */
+  document.querySelectorAll("[data-i18n-template]").forEach((el) => {
+    const template = t(el.dataset.i18nTemplate, l);
+    const link = el.querySelector("[data-i18n-template-link]");
+    if (!link) return;
+    const marker = "{terms}";
+    const at = template.indexOf(marker);
+    link.textContent = t(link.dataset.i18nTemplateLink, l);
+    if (at < 0) { el.replaceChildren(document.createTextNode(template)); return; }
+    el.replaceChildren(
+      document.createTextNode(template.slice(0, at)),
+      link,
+      document.createTextNode(template.slice(at + marker.length)),
+    );
+  });
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh, l); });
   document.querySelectorAll("[data-i18n-alt]").forEach((el) => { el.alt = t(el.dataset.i18nAlt, l); });
   // Controls whose whole label is the aria-label: the menu button, the theme switch,

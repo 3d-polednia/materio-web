@@ -114,8 +114,9 @@ head("0. the tree this suite is reading");
   // 525 since session 62 added /kontakt/ for audit item H7: one route, thirteen languages.
   // 2026-10-01: thirteen noindex public quote pages, one per language, raise 538 to 551.
   // 2026-10-12: thirteen noindex /maile/ pages (survey and unsubscribe from the trial e-mails).
+  // 2026-11-11: terms, cancel and withdraw pages for LiczMat Pro, thirteen languages each: +39.
   check("the generated tree and the hand-written error page are present",
-    PAGES.length === 577, `found ${PAGES.length}`);
+    PAGES.length === 616, `found ${PAGES.length}`);
   check("every page declares a language",
     PAGES.every((page) => page.lang), PAGES.filter((page) => !page.lang).map((x) => x.url).join(", "));
   const codes = new Set(LANGS.map((l) => HREFLANG[l]));

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com 'sha256-U90HsvI1oAM1K+XtcHRs58ChSIOUGMMnFJnUluIJTUM=' 'sha256-oa3ynefWb1ZxYFVg6U5KKmXy2ecmWWCgP8lCgw0kTNI=' 'sha256-5YwV+b/E1XdA3gKeXhFbA75PEGb3cjuJ7CJUIzBZqMo=' 'sha256-yEEoJNlluf8KncW+3bXm/3dmAWUpzNmUwb0ktGndlzU='; style-src 'self'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' blob: https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net; frame-src 'self'; manifest-src 'self'">
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function granted() {
+      try { return localStorage.getItem('materio_consent') === 'granted'; } catch (e) { return false; }
+    }
+    function loadTag() {
+      if (sent || !granted()) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    function afterLoad() {
+      if (document.readyState === 'complete') setTimeout(loadTag, 0);
+      else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+    }
+    afterLoad();
+    document.addEventListener('consentchange', function (e) {
+      if (e.detail && e.detail.granted) afterLoad();
+    });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Términos y condiciones de LiczMat Pro | LiczMat</title>
+<meta name="description" content="El proveedor de LiczMat Pro es Michał Polednia , Widderweg 17, 85570 Markt Schwaben, Deutschland, teléfono: +49 176 66621263 , correo electrónico:...">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/es/condiciones/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/regulamin/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/umovy/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/agb/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/terms/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/obchodni-podminky/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/obchodne-podmienky/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/termeni-si-conditii/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/uvjeti-koristenja/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/uslovi-koriscenja/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/termini-e-condizioni/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/voorwaarden/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/condiciones/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/conditions-generales/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/regulamin/">
+<link rel="icon" href="/assets/favicon.svg?v=20261111a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20261111a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261111a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:title" content="Términos y condiciones de LiczMat Pro | LiczMat">
+<meta property="og:description" content="El proveedor de LiczMat Pro es Michał Polednia , Widderweg 17, 85570 Markt Schwaben, Deutschland, teléfono: +49 176 66621263 , correo electrónico:...">
+<meta property="og:url" content="https://liczmat.com/es/condiciones/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat. Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Términos y condiciones de LiczMat Pro | LiczMat">
+<meta name="twitter:description" content="El proveedor de LiczMat Pro es Michał Polednia , Widderweg 17, 85570 Markt Schwaben, Deutschland, teléfono: +49 176 66621263 , correo electrónico:...">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat. Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20261111a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://liczmat.com/es/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Términos y condiciones de LiczMat Pro",
+      "item": "https://liczmat.com/es/condiciones/"
+    }
+  ]
+}
+</script>
+
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/regulamin/",
+  "uk": "/uk/umovy/",
+  "de": "/de/agb/",
+  "en": "/en/terms/",
+  "cs": "/cs/obchodni-podminky/",
+  "sk": "/sk/obchodne-podmienky/",
+  "ro": "/ro/termeni-si-conditii/",
+  "hr": "/hr/uvjeti-koristenja/",
+  "sr": "/sr/uslovi-koriscenja/",
+  "it": "/it/termini-e-condizioni/",
+  "nl": "/nl/voorwaarden/",
+  "es": "/es/condiciones/",
+  "fr": "/fr/conditions-generales/"
+};</script>
+<script defer src="/assets/i18n.es.js?v=20261111a"></script>
+<script defer src="/assets/i18n-runtime.min.js?v=20261111a"></script>
+<script defer src="/assets/currency.min.js?v=20261111a"></script>
+<script defer src="/assets/account.min.js?v=20261111a"></script>
+<script defer src="/assets/main.min.js?v=20261111a"></script>
+</head>
+<body>
+<svg class="logo-defs" aria-hidden="true" focusable="false"><symbol id="lm-mark" viewBox="67.75 577 372 372"><g transform="translate(0,1024) scale(0.5,-0.5)"><path fill="currentColor" d="m148 787l0-107 22-24c11-14 24-28 27-32 3-4 18-21 33-38 25-29 54-62 89-104 8-9 19-23 26-31 13-15 52-62 76-92 9-11 21-25 26-32 6-7 21-26 35-42 13-17 25-31 26-31 1 0 16 18 33 39 18 22 37 46 43 53 6 7 15 18 19 23 4 6 18 23 31 38 13 15 28 34 35 42 7 8 19 22 27 32 8 10 29 34 45 53 17 19 33 38 37 43 4 4 26 29 48 55l42 48 0 107 0 107-59 0-60 0-12-17c-7-10-16-23-20-29-5-6-26-36-48-67-22-31-45-63-51-72-7-9-23-32-37-52-14-20-33-47-43-60-10-13-20-28-23-32-3-5-6-9-7-9-1 0-14 18-29 40-15 21-49 69-76 106-26 37-67 95-92 129l-44 63-59 0-60 0 0-107zm130-32c24-33 57-77 73-98 16-21 45-61 66-89 21-28 42-57 48-65 6-8 17-24 26-35 9-12 16-22 17-22 1 0 6 6 11 14 15 21 102 138 141 190 73 99 123 166 127 171l5 6 0-63 0-64-9-9c-19-22-205-249-254-308l-21-27-7 9c-4 4-27 33-51 63-25 30-51 62-58 71-8 9-21 25-30 36-34 41-90 108-113 137l-25 29 0 63 0 63 5-6c2-3 24-33 49-66z"/><path fill="var(--brand-lime)" d="m146 596l0-42 14 0c11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5 0-5 0-5 14-5 13 0 14 0 14-4 0-4-1-4-14-4-14 1-14 1-14-4 0-5 1-5 5-4 8 1 23-2 23-5 0-2-3-3-14-3-14 0-14 0-14-5l0-6 14 1c13 0 14 0 14-4 0-4-1-4-14-4l-14 1 0-5 0-6 25 0c21 0 25 0 25-3 0-3-4-3-25-3l-25 0 0-5 0-6 14 1c13 0 14 0 14-4 0-4-1-4-14-4-11 1-14 0-15-2-1-7 1-8 15-8 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5 0-5 0-5 14-5 13 0 14 0 14-4 0-4-1-4-14-4l-14 1 0-6 0-5 13 0c12 1 14 0 15-2 0-4-1-4-14-4-14 0-14 0-14-5l0-5 25 0c22 0 25 0 25-3-1-3-5-3-25-3l-25-1 0-5c0-5 0-5 9-4 12 1 19-1 19-5 0-2-3-3-14-3-14 0-14 0-14-5 0-5 0-5 14-5 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5l0-6 14 1c13 0 14 0 14-4 0-4-1-4-14-4l-14 1 0-5c0-6 0-6 14-6 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5l0-6 24 0c22 0 25 0 26-3 0-4-2-4-25-4l-25 0 0-5c0-5 0-5 14-5 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5 0-5 0-5 14-5 13 0 14 0 14-4 0-4-1-4-14-4-14 0-14 0-14-5 0-5 0-5 14-5 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5l0-6 14 1c13 0 14 0 14-3-1-3-3-4-15-4-13 0-13 0-13-6l0-5 24 0c22 1 25 1 26-2 0-4-2-4-25-4l-25 0 0-38 0-38 39 0 39 0 0 7c0 11 2 19 5 19 2 0 3-3 3-13 0-12 0-13 5-13l5 0 0 25c1 22 2 26 4 26 2 0 3-4 4-26l0-25 5 0c5 0 5 1 5 13 1 7 2 13 3 13 1 0 2-6 3-13 0-12 0-13 5-13 4 0 5 1 5 6 0 10 3 20 5 20 2 0 3-3 3-13 0-13 0-13 5-13 5 0 5 0 5 13 0 12 0 13 4 13 4 0 4-1 4-13 0-13 0-13 5-13 5 0 5 0 5 13 0 10 1 13 3 13 2 0 3-3 3-13 1-11 1-12 5-13 5 0 5 0 5 25 1 23 1 26 5 27 3 0 3-2 3-26l0-26 5 0c5 0 5 0 5 13 0 12 0 13 4 13 4 0 4-1 4-13 0-13 0-13 5-13 5 0 5 0 5 13 0 10 1 13 3 13 2 0 3-3 3-13l0-13 6 0 6 0 0 13c0 10 1 13 3 13 2 0 3-3 3-13 0-13 0-13 5-13 5 0 5 1 5 10 0 12 1 16 5 16 2 0 3-3 3-13 0-12 0-13 5-13l5 0 0 25c1 22 2 26 4 26 3 0 3-4 3-26l0-25 6 0c5 0 5 0 5 13 0 10 1 13 3 13 2 0 3-3 3-13 0-13 0-13 5-13 5 0 5 0 5 13 0 12 0 13 4 13 4 0 4-1 4-13 0-13 0-13 5-13 5 0 5 0 5 13 0 10 1 13 3 13 2 0 3-3 3-13 0-13 0-13 6-13l5 0-1 13c0 10 0 13 3 14 4 1 6-3 5-16-1-11-1-11 4-11l6 0 0 26c1 21 2 25 4 25 2 0 3-4 4-25 0-22 1-26 3-26 3 0 3 5 3 36l-1 35-148 1-148 1-1 170-1 170-10 12c-5 7-14 16-18 21-5 5-11 12-14 16-10 13-23 26-26 26-3 0-3-7-3-42zm46-399c5-7 5-10 1-16-7-10-21-4-21 8 0 5 8 13 13 13 2 0 5-2 7-5z"/><path fill="var(--brand-lime)" d="m856 628c-5-6-14-16-21-23-22-25-21-21-21-61l0-36-23 0c-13 0-24-1-25-1-2 0-3-5-4-16-1-26-2-25 27-25l25 0 0-21 0-21-10 0c-6 0-10-1-12-3-1-2-2-9-2-20l1-18 12-1 11 0 0-22-1-21-23 0c-13-1-24-1-26-2-1-1-2-6-2-19l1-19 25-1 25-1 1-17c0-19-1-22-13-22l-7 0 0-19 1-20 9-1 9-1 1-18 0-19-25 0-26-1-1-14 0-15 54 0c30 1 42 1 27 1-27 1-29 1-29 5 0 4 1 4 28 4 28 0 28 0 28 4-1 4-2 5-12 4-14 0-20 1-20 5 0 2 3 3 16 3 16 0 16 0 16 5 0 5 0 5-16 5-13 0-16 1-16 3 0 2 3 3 16 3 16 0 16 0 16 5 0 5 0 5-16 5-13 0-16 1-16 3 0 2 3 3 16 3l16 0 0 6 0 5-16-1c-14 0-16 0-16 3 0 2 3 3 16 3 16 0 16 0 16 5l0 5-28 0c-24 1-29 1-29 4 0 3 5 3 29 4 26 0 28 0 28 4 0 4-1 4-13 4-8 0-15 1-17 2-6 3 1 6 15 6 14 0 15 0 15 5 0 4-1 4-15 4-14 0-16 0-17 4 0 3 1 3 16 3l16-1 0 6c0 5 0 5-11 4-13-2-21 0-21 4 0 2 3 3 16 3 16 0 16 0 16 5 0 5 0 5-16 5-13 0-16 1-16 3 0 2 3 3 16 3 16 0 16 0 16 5l0 5-28 0c-24 0-28 0-28 3 0 3 4 3 28 3l28 0 0 5c0 5 0 5-16 5-12 0-16 1-16 3 0 4 5 5 19 5 12 0 13 0 13 5 0 4-1 4-15 4-13 0-16 1-16 3 0 2 3 3 16 3 15 0 15 0 15 5 0 6 0 6-12 5-15-1-20 0-20 4 0 2 3 3 16 3 16 0 16 0 16 5 0 5 0 5-16 5-13 0-16 1-16 3 0 3 2 3 16 3l16-1 0 6 0 5-29 0c-24 0-29 0-29 3 0 3 5 3 29 3l29 0 0 5c0 5 0 5-16 5-12 0-16 1-16 3 0 2 4 3 14 4 8 1 15 1 16 0 1-1 2 1 2 4 0 5 0 5-16 5-15 0-16 0-16 4 0 4 1 4 16 4 16-1 16-1 16 4 0 5 0 5-15 5-13 0-16 1-16 3 0 2 3 3 16 3 14 0 15 0 15 5 0 4-1 4-13 4-8 0-15 1-17 2-6 3 1 6 15 6l15 0 0 6 0 5-28 0c-38 0-38 4 0 5l28 0 0 76c0 86 0 83-14 66z"/></g></symbol></svg>
+<a class="skip-link" href="#main" data-i18n="skip_main">Ir al contenido</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/es/"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Navegación principal">
+      <ul class="nav-list">
+        <li><a href="/es/calculadoras/">Calculadoras</a></li>
+        <li><a href="/es/materiales/">Materiales</a></li>
+        <li><a href="/es/tiendas/">Tiendas</a></li>
+        <li><a href="/es/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/es/app-android/">La app</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Idioma">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span class="lang-btn-name">Español</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/regulamin/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/umovy/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/agb/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/terms/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/obchodni-podminky/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/obchodne-podmienky/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/termeni-si-conditii/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/uvjeti-koristenja/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/uslovi-koriscenja/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><a class="lang-item" href="/it/termini-e-condizioni/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+      <li><a class="lang-item" href="/nl/voorwaarden/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></span></li>
+      <li><a class="lang-item" href="/fr/conditions-generales/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+    </ul>
+  </div>
+        <span class="cur-picker"><select id="currency-select" class="cur-select" aria-label="Moneda" title="Moneda"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow">Mi cuenta</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar el tema" title="Cambiar el tema"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Abrir el menú"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1" class="doc">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/es/">Inicio</a></li><li aria-current="page">Términos y condiciones de LiczMat Pro</li></ol></nav>
+    <article lang="es">
+    <h1>Términos y condiciones de LiczMat Pro</h1>
+    <p class="muted"><time datetime="2026-11-11">11 de noviembre de 2026</time></p>
+    <p class="muted privacy-translation"><a href="/de/agb/">Esta es una traducción. La versión en alemán es vinculante.</a></p>
+    <nav class="toc" aria-label="Índice"><ul><li><a href="#anbieter">1. Proveedor y ámbito de aplicación</a></li><li><a href="#leistung">2. Prestación de servicios</a></li><li><a href="#test">3. Período de prueba gratuito</a></li><li><a href="#vertrag">4. Celebración del contrato</a></li><li><a href="#preise">5. Precios y pago</a></li><li><a href="#laufzeit">6. Duración y cancelación</a></li><li><a href="#widerruf">7. Información sobre el ejercicio del derecho de desistimiento</a></li><li><a href="#formular">8. Modelo de formulario de desistimiento</a></li><li><a href="#geld-zurueck">9. Reembolso adicional en un plazo de 14 días</a></li><li><a href="#pflichten">10. Obligaciones del cliente</a></li><li><a href="#aenderungen">11. Modificaciones de los servicios</a></li><li><a href="#gewaehrleistung">12. Garantía legal y conformidad</a></li><li><a href="#haftung">13. Responsabilidad</a></li><li><a href="#preisaenderung">14. Modificaciones de precios</a></li><li><a href="#agb-aenderung">15. Modificaciones de las presentes condiciones</a></li><li><a href="#datenschutz">16. Protección de datos</a></li><li><a href="#streit">17. Resolución de litigios de consumo</a></li><li><a href="#schluss">18. Disposiciones finales</a></li></ul></nav>
+    <h2 id="anbieter">1. Proveedor y ámbito de aplicación</h2><p>El proveedor de LiczMat Pro es <b>Michał Polednia</b>, Widderweg 17, 85570 Markt Schwaben, Deutschland, teléfono: <a href="tel:+49 176 66621263">+49 176 66621263</a>, correo electrónico: <a href="mailto:contact@liczmat.com">contact@liczmat.com</a>, NIF/IVA: DE329791818.</p><p>Los presentes Términos y condiciones se aplican a la suscripción de pago <b>LiczMat Pro</b>, ofrecida en liczmat.com para la aplicación web en <a href="/app/">liczmat.com/app/</a>. Las calculadoras gratuitas en liczmat.com, la aplicación para Android y la cuenta gratuita de LiczMat se proporcionan de forma gratuita y no forman parte del contrato de pago.</p><p>Se entiende por consumidor, en el sentido del artículo 13 del Código Civil alemán (BGB), toda persona física que celebre un negocio jurídico con fines que no puedan atribuirse predominantemente ni a su actividad comercial ni a su actividad profesional independiente. Se entiende por empresario, en el sentido del artículo 14 del BGB, toda persona física o jurídica o sociedad con capacidad jurídica que, al celebrar el contrato, actúe en el ejercicio de su actividad comercial o profesional independiente.</p><p>No se aplican las condiciones generales propias del cliente.</p><h2 id="leistung">2. Prestación de servicios</h2><p>LiczMat Pro pone a su disposición en el navegador las funciones Pro tal como se describen en la <a href="/es/liczmat-pro/">página de LiczMat Pro</a> en el momento de realizar el pedido. Estas incluyen, en particular, la gestión de clientes, presupuestos en formato PDF y con enlace para compartir, planificación de plazos, precios y costes en proyectos, así como el almacenamiento de los datos de la empresa. LiczMat almacena en su cuenta los datos introducidos por usted.</p><p>Los cálculos y los presupuestos elaborados a partir de ellos son herramientas de ayuda. Le corresponde a usted verificar cantidades, precios, resultados y la idoneidad para el fin previsto antes de comprar material o presentar una oferta.</p><p>No se garantiza una disponibilidad ininterrumpida. Pueden producirse tareas de mantenimiento, anomalías técnicas e interrupciones. Procuramos limitar las restricciones al mínimo posible.</p><h2 id="test">3. Período de prueba gratuito</h2><p>Las cuentas nuevas reciben LiczMat Pro <b>gratis durante 14 días</b>. Para ello no se requieren datos de pago. El período de prueba finaliza automáticamente y no se convierte en una suscripción de pago. Tras su finalización, la cuenta vuelve al plan gratuito.</p><h2 id="vertrag">4. Celebración del contrato</h2><p>La presentación de LiczMat Pro en el sitio web no constituye una oferta vinculante para la celebración de un contrato.</p><p>Para realizar el pedido, inicia sesión en <a href="/app/">liczmat.com/app/</a>, selecciona la suscripción mensual o anual y hace clic en el botón de compra. Se le redirige a la página de pago de Stripe. Allí introduce su dirección de correo electrónico y sus datos de pago. Antes del clic definitivo puede revisar y corregir todos los datos introducidos. El contrato se celebra cuando hace clic en el botón de confirmación de la suscripción de pago.</p><p>El proveedor de servicios de pago es Stripe Payments Europe, Limited (Irlanda). Stripe confirma la celebración del contrato por correo electrónico.</p><p>El contrato puede formalizarse en cualquiera de los 13 idiomas ofrecidos en el sitio web. La versión en alemán es vinculante. No conservamos el texto del contrato de forma separada. Los presentes Términos y condiciones están siempre disponibles en esta dirección y pueden guardarse o imprimirse. Los recibos y facturas están disponibles en el portal de clientes de Stripe.</p><h2 id="preise">5. Precios y pago</h2><p>Se aplican los precios indicados en la <a href="/es/liczmat-pro/">página de LiczMat Pro</a> y en la pantalla de pago en el momento del pedido. Se trata de precios finales. No existen costes adicionales. La facturación se efectúa en la moneda mostrada en la pantalla de pago.</p><p>El precio se factura por adelantado para el período correspondiente, un mes o un año, y se cobra automáticamente al comienzo de cada período mediante el método de pago seleccionado. Se encuentran disponibles los métodos de pago ofrecidos en la pantalla de pago.</p><h2 id="laufzeit">6. Duración y cancelación</h2><h3>6.1. Suscripción mensual</h3><p>La suscripción mensual tiene una duración de un mes. Se renueva sucesivamente por un mes más si no se cancela. Puede cancelarla en cualquier momento con efecto al término del mes contractual en curso.</p><h3>6.2. Suscripción anual</h3><p>La duración inicial es de un año. Puede cancelar la suscripción en cualquier momento con efecto al término de ese año. Si no se cancela, continuará por tiempo indefinido tras el primer año y podrá cancelarse en cualquier momento con un plazo de preaviso de un mes. La facturación continuará realizándose por adelantado anualmente. Le reembolsaremos de forma prorrateada cualquier importe ya abonado correspondiente al período posterior a la finalización del contrato.</p><h3>6.3. Vías de cancelación</h3><p>Puede cancelar la suscripción en el portal de clientes a través de la sección <b>Cuenta</b> en <a href="/app/">liczmat.com/app/</a>, mediante el botón <a href="/es/cancelar-contrato/">«Cancelar contratos aquí»</a>, por correo electrónico a <a href="mailto:contact@liczmat.com">contact@liczmat.com</a> o mediante carta dirigida a Michał Polednia, Widderweg 17, 85570 Markt Schwaben, Deutschland. El derecho a rescindir el contrato por causa justificada permanece inalterado.</p><h3>6.4. Consecuencias de la finalización del contrato</h3><p>Una vez finalizado el contrato, la cuenta vuelve al plan gratuito. Sus datos permanecen almacenados en la cuenta. Las funciones Pro dejan de estar disponibles hasta que se vuelva a solicitar LiczMat Pro. Encontrará información sobre la eliminación de la cuenta en la <a href="/es/politica-de-privacidad/">Política de privacidad</a>.</p><h2 id="widerruf">7. Información sobre el ejercicio del derecho de desistimiento</h2><p>El siguiente derecho legal de desistimiento es aplicable únicamente a los consumidores.</p><h3>Derecho de desistimiento</h3><p>Tiene usted derecho a desistir del presente contrato en un plazo de 14 días sin necesidad de justificación.</p><p>El plazo de desistimiento expirará a los 14 días del día de la celebración del contrato.</p><p>Para ejercer el derecho de desistimiento, deberá usted notificarnos a <b>Michał Polednia</b>, Widderweg 17, 85570 Markt Schwaben, Deutschland, teléfono: <a href="tel:+49 176 66621263">+49 176 66621263</a>, correo electrónico: <a href="mailto:contact@liczmat.com">contact@liczmat.com</a>, su decisión de desistir del presente contrato a través de una declaración inequívoca, por ejemplo, una carta enviada por correo postal o por correo electrónico.</p><p>Podrá utilizar el modelo de formulario de desistimiento que figura a continuación o la función de desistimiento en la página <a href="/es/desistimiento/">«Desistir del contrato aquí»</a>, aunque su uso no es obligatorio. Si recurre a esta opción en línea, le transmitiremos sin demora indebida en un soporte duradero, por ejemplo por correo electrónico, el acuse de recibo de dicho desistimiento con indicación de su contenido, así como la fecha y la hora de su recepción.</p><p>Para cumplir el plazo de desistimiento, basta con que la comunicación relativa al ejercicio por su parte de este derecho sea enviada antes de que venza el plazo correspondiente.</p><h3>Consecuencias del desistimiento</h3><p>En caso de desistimiento por su parte, le devolveremos todos los pagos recibidos de usted, sin ninguna demora indebida y, en todo caso, a más tardar 14 días a partir de la fecha en la que se nos informe de su decisión de desistir del presente contrato.</p><p>Procederemos a efectuar dicho reembolso utilizando el mismo medio de pago empleado por usted para la transacción inicial, a no ser que haya usted dispuesto expresamente lo contrario; en todo caso, no incurrirá en ningún gasto como consecuencia del reembolso.</p><p>No exigimos ninguna compensación económica por el período transcurrido hasta el desistimiento.</p><h2 id="formular">8. Modelo de formulario de desistimiento</h2><p>Solo debe cumplimentar y enviar el presente formulario si desea desistir del contrato.</p><ul><li>A la atención de: <b>Michał Polednia</b>, Widderweg 17, 85570 Markt Schwaben, Deutschland, correo electrónico: <a href="mailto:contact@liczmat.com">contact@liczmat.com</a></li><li>Por la presente le comunico/comunicamos (*) que desisto de mi/desistimos de nuestro (*) contrato de prestación del siguiente servicio: <b>LiczMat Pro (suscripción)</b>.</li><li>Pedido el (*)</li><li>Nombre del consumidor o de los consumidores</li><li>Domicilio del consumidor o de los consumidores</li><li>Firma del consumidor o de los consumidores, solo si el presente formulario se presenta en papel</li><li>Fecha</li></ul><p>(*) Táchese lo que no proceda.</p><h2 id="geld-zurueck">9. Reembolso adicional en un plazo de 14 días</h2><p>De forma adicional al derecho legal de desistimiento, reembolsamos el importe íntegro abonado a cualquier cliente, incluidos los empresarios, si el cliente desiste o cancela dentro de los 14 días posteriores a la primera compra de una suscripción a LiczMat Pro. Esta regla se aplica únicamente a la primera compra por cuenta y no se aplica a las renovaciones.</p><h2 id="pflichten">10. Obligaciones del cliente</h2><ul><li>Proporciona datos exactos y completos y los mantiene actualizados.</li><li>Mantiene su contraseña en secreto y protege el acceso a su cuenta.</li><li>No incluye contenidos ilícitos en los presupuestos ni en los enlaces compartidos. Cualquier persona que conozca un enlace compartido de un presupuesto o proyecto puede ver su contenido.</li></ul><h2 id="aenderungen">11. Modificaciones de los servicios</h2><p>Únicamente podremos modificar el servicio por una razón justificada, por ejemplo debido a nuevas disposiciones legales, por motivos de seguridad o debido al desarrollo técnico. La modificación no supondrá ningún coste adicional para usted. Le informaremos de manera clara y con la debida antelación.</p><p>Si una modificación menoscaba el acceso o el uso del consumidor de manera más que insignificante, este podrá rescindir el contrato de forma gratuita en un plazo de 30 días a partir de la recepción de la información o de la modificación, según lo que ocurra más tarde (§ 327r BGB).</p><h2 id="gewaehrleistung">12. Garantía legal y conformidad</h2><p>Se aplican los derechos legales de garantía por defectos y falta de conformidad. Para los consumidores se aplican en particular los artículos 327 y siguientes del Código Civil alemán (BGB).</p><h2 id="haftung">13. Responsabilidad</h2><p>Respondemos de forma ilimitada en caso de dolo o negligencia grave, en caso de daños contra la vida, la integridad física o la salud, así como en virtud de la Ley alemana de responsabilidad por productos defectuosos (Produkthaftungsgesetz).</p><p>En caso de negligencia leve, solo responderemos por el incumplimiento de una obligación contractual esencial. Las obligaciones contractuales esenciales, también denominadas obligaciones cardinales, son aquellas cuyo cumplimiento permite la debida ejecución del contrato y en cuya observancia el cliente confía habitualmente. En tal caso, la responsabilidad se limitará a los daños típicos del contrato y previsibles. En todos los demás supuestos, queda excluida la responsabilidad por negligencia leve.</p><p>La responsabilidad legal en virtud de los artículos 327 y siguientes del BGB permanece inalterada.</p><h2 id="preisaenderung">14. Modificaciones de precios</h2><p>El precio de una suscripción vigente solo variará con su consentimiento expreso. Le informaremos con un mínimo de 30 días de antelación. Sin su consentimiento, la suscripción continuará al precio anterior. Cualquiera de las partes podrá darla por concluida al término del período ya abonado.</p><h2 id="agb-aenderung">15. Modificaciones de las presentes condiciones</h2><p>Las modificaciones de los presentes Términos y condiciones se aplicarán a un contrato en vigor únicamente con su consentimiento expreso. Le informaremos con un mínimo de 30 días de antelación. Sin su consentimiento, seguirán aplicándose las condiciones anteriores. Cualquiera de las partes podrá dar por concluida la suscripción al término del período ya abonado.</p><h2 id="datenschutz">16. Protección de datos</h2><p>Encontrará información sobre el tratamiento de datos personales en la <a href="/es/politica-de-privacidad/">Política de privacidad</a>.</p><h2 id="streit">17. Resolución de litigios de consumo</h2><p>No estamos dispuestos ni obligados a participar en procedimientos de resolución de litigios ante una junta arbitral de consumo (§ 36 VSBG).</p><h2 id="schluss">18. Disposiciones finales</h2><p>Se aplica el derecho alemán, con exclusión de la Convención de las Naciones Unidas sobre los contratos de compraventa internacional de mercaderías. En el caso de los consumidores, esta elección de ley solo se aplica en la medida en que no les prive de la protección de las disposiciones imperativas del país de su residencia habitual.</p><p>Para los comerciantes, personas jurídicas de derecho público y patrimonios especiales de derecho público, el fuero competente corresponde al domicilio del proveedor.</p><p>En caso de que alguna disposición del presente contrato fuera o resultara nula, las demás disposiciones permanecerán vigentes.</p><p>La versión en alemán es vinculante. Las traducciones tienen un carácter meramente informativo.</p>
+  </article>
+  </main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
+        <p class="muted">Calculadora de materiales de construcción.</p>
+      </div>
+      <div class="foot-group">
+        <h2>Producto</h2>
+        <ul class="foot-product">
+          <li><a href="/es/calculadoras/">Todas las calculadoras</a></li>
+          <li><a href="/es/conversor-de-unidades/">Conversor de unidades</a></li>
+          <li><a href="/es/materiales/">Materiales</a></li>
+          <li><a href="/es/guias/">Guías</a></li>
+          <li><a href="/es/tiendas/">Tiendas</a></li>
+          <li><a href="/es/liczmat-pro/">LiczMat Pro</a></li>
+          <li><a href="/es/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="foot-group">
+        <h2>Cuenta</h2>
+        <ul>
+          <li><a href="/es/app-android/">La app</a></li>
+          <li><a href="/app/" rel="nofollow">Mi cuenta</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div class="foot-group foot-legal">
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/es/contacto/">Contacto e Impressum</a></li>
+          <li><a href="/es/politica-de-privacidad/">Política de privacidad</a></li>
+          <li><a href="/es/cookies/">Cookies</a></li>
+          <li><a href="/es/condiciones/">Condiciones</a></li>
+          <li><a href="/es/cancelar-contrato/">Cancela el contrato aquí</a></li>
+          <li><a href="/es/desistimiento/">Desiste del contrato aquí</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Idioma">
+      <h2>Idioma</h2>
+      <ul>
+        <li><a href="/regulamin/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/umovy/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/agb/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/terms/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/obchodni-podminky/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/obchodne-podmienky/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/termeni-si-conditii/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/uvjeti-koristenja/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/uslovi-koriscenja/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/termini-e-condizioni/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/voorwaarden/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/condiciones/" hreflang="es" lang="es" data-lang="es" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/conditions-generales/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Todos los derechos reservados.</span>
+      <span class="foot-who">Michał Polednia · Widderweg 17, 85570 Markt Schwaben, Deutschland · <a href="mailto:contact@liczmat.com">contact@liczmat.com</a></span>
+      <span>Los resultados son estimaciones. Compruébalos siempre antes de comprar.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Usamos Google Analytics para contar el tráfico anónimo del sitio y cuánta gente pasa a Google Play. ¿Estás de acuerdo?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/es/politica-de-privacidad/">Más en la política de privacidad</a>
+    <a class="consent-more" href="/es/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Rechazar</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Acepto</button>
+  </div>
+</div>
+
+</body>
+</html>

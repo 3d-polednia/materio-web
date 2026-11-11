@@ -2,12 +2,14 @@
  * Wspolny szablon wiadomosci LiczMat. Plik jest czysty: bez Firebase i sieci.
  */
 
+import { ENTITY } from "./site-entity.mjs";
+
 export const MAIL_LANGS = Object.freeze([
   "pl", "uk", "de", "en", "cs", "sk", "ro", "hr", "sr", "it", "nl", "es", "fr"
 ]);
 
-export const MAIL_FROM = "LiczMat <contact@liczmat.com>";
-export const MAIL_REPLY_TO = "contact@liczmat.com";
+export const MAIL_FROM = `LiczMat <${ENTITY.email}>`;
+export const MAIL_REPLY_TO = ENTITY.email;
 export const MAIL_LOGO = "https://liczmat.com/assets/email/liczmat-logo.png";
 
 export const URL_CONTACT = Object.freeze({

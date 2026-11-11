@@ -501,7 +501,9 @@ const BUDGET = {
   // A full thirteen-language rebuild measures French at 556; these are existing form labels.
   // 2026-10-03, 560 -> 572, measured 568 words (fr): the phone error under both client forms
   // (hidden until a number is refused, but it is text the visitor can be shown).
-  company: 330, clients: 572, jobs: 544, quotes: 800, calendar: 450,
+  // 2026-11-11: the Pro purchase disclosure is a required line under every buy button;
+  // French is widest at 339 words.
+  company: 340, clients: 572, jobs: 544, quotes: 800, calendar: 450,
   // 2026-10-01: public quote markup is widest in French at 176; four words remain for drift.
   "quote-share": 190,
   // 2026-10-12: the public mail-response page is a short survey form; French is widest at 67 words.
@@ -541,7 +543,11 @@ const BUDGET = {
      profile; Klienci with its four labelled fields is what moved the number. */
   // 2026-10-04: approved Pro page adds three access levels, the feature matrix and three
   // real product samples; its 13-language maximum stays below this measured ceiling.
-  "liczmat-pro": 1080, account: 470, dashboard: 130, share: 40, privacy: 3820,
+  // 2026-11-11: the required purchase disclosure makes French widest at 1088 words.
+  "liczmat-pro": 1090, account: 470, dashboard: 130, share: 40, privacy: 3820,
+  // 2026-11-11: legal text is deliberately complete; Spanish is widest at 2033 words.
+  // Contract pages are short labelled forms; Spanish is widest at 112 and 97 words.
+  terms: 2040, cancel: 115, withdraw: 100,
   // The compatibility URL carries the complete Polish and English policies in sequence.
   // 2026-10-05: two full policy languages now disclose private calendar feed links.
   "privacy-legacy": 4830,

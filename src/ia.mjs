@@ -29,7 +29,7 @@ import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlClient,
   urlJobs, urlJob, urlQuotes, urlQuote, urlQuoteView, urlCalendar, urlLiczmatPro, urlConverter,
-  urlOwnMaterials, urlContact, urlPrivacy, urlMail,
+  urlOwnMaterials, urlContact, urlPrivacy, urlTerms, urlCancel, urlWithdraw, urlMail,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -466,6 +466,27 @@ export const ROUTES = [
     path: urlPrivacy,
     note: "The German text is binding. Every other language links to it from a visible " +
       "translation note. /privacy-policy.html remains a generated compatibility page.",
+  },
+  {
+    id: "terms",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "home", localized: true, indexable: true,
+    path: urlTerms,
+    note: "The German LiczMat Pro terms are binding. Every translation links to them.",
+  },
+  {
+    id: "cancel",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "terms", localized: true, indexable: true,
+    path: urlCancel,
+    note: "The contract cancellation notice under section 312k BGB. It works without an account.",
+  },
+  {
+    id: "withdraw",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "terms", localized: true, indexable: true,
+    path: urlWithdraw,
+    note: "The online withdrawal notice. It works without an account.",
   },
   {
     id: "privacy-legacy",
