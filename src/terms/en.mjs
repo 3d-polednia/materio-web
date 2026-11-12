@@ -30,7 +30,7 @@ export default {
     {
       id: "preise",
       h: "5. Prices and payment",
-      html: `<p>The prices displayed on the <a href="/en/liczmat-pro/">LiczMat Pro page</a> and in the checkout at the time of the order apply. They are final prices. There are no additional costs. Billing is in the currency displayed in the checkout.</p><p>The price is billed in advance for the relevant period, one month or one year, and is automatically charged at the start of each period using the payment method selected in the checkout. The payment methods offered in the checkout are available.</p>`
+      html: `<p>The prices displayed on the <a href="/en/liczmat-pro/">LiczMat Pro page</a> and in the checkout at the time of the order apply. These are final prices including statutory VAT. There are no additional costs. Billing is in the currency displayed in the checkout.</p><p>The price is billed in advance for the relevant period, one month or one year, and is automatically charged at the start of each period using the payment method selected in the checkout. The payment methods offered in the checkout are available.</p>`
     },
     {
       id: "laufzeit",

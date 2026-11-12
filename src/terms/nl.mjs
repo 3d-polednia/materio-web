@@ -30,7 +30,7 @@ export default {
     {
       id: "preise",
       h: "5. Prijzen en betaling",
-      html: `<p>Van toepassing zijn de prijzen die op het moment van de bestelling op de <a href="/nl/liczmat-pro/">LiczMat Pro-pagina</a> en in de checkout worden getoond. Dit zijn eindprijzen. Er zijn geen bijkomende kosten. Facturering vindt plaats in de valuta die in de checkout wordt getoond.</p><p>De prijs wordt vooraf gefactureerd voor de betreffende periode, één maand of één jaar, en wordt aan het begin van elke periode automatisch afgeschreven via de in de checkout gekozen betaalmethode. De in de checkout aangeboden betaalmethoden zijn beschikbaar.</p>`
+      html: `<p>Van toepassing zijn de prijzen die op het moment van de bestelling op de <a href="/nl/liczmat-pro/">LiczMat Pro-pagina</a> en in de checkout worden getoond. Dit zijn eindprijzen inclusief de wettelijk verschuldigde btw. Er zijn geen bijkomende kosten. Facturering vindt plaats in de valuta die in de checkout wordt getoond.</p><p>De prijs wordt vooraf gefactureerd voor de betreffende periode, één maand of één jaar, en wordt aan het begin van elke periode automatisch afgeschreven via de in de checkout gekozen betaalmethode. De in de checkout aangeboden betaalmethoden zijn beschikbaar.</p>`
     },
     {
       id: "laufzeit",

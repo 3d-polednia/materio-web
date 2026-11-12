@@ -51,7 +51,7 @@ export const proKeys = (features) => [
   "pro_need_account", "pro_need_pro", "pro_signin", "pro_incl_t",
   // Session 28, the subscription: the two plans, the way to the checkout, and the four
   // sentences the account page needs for the states a plan can be in.
-  "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_buy_monthly", "pay_buy_yearly", "pay_go", "pay_monthly_t", "pay_monthly_per",
+  "pay_t", "pay_d", "pay_vat_note", "pay_soon", "pay_buy", "pay_buy_monthly", "pay_buy_yearly", "pay_go", "pay_monthly_t", "pay_monthly_per",
   "pay_terms", "pay_terms_link",
   "pay_yearly_t", "pay_yearly_per", "pay_manage", "pay_manage_d",
   "plan_renews", "plan_cancelled", "plan_cancel_d", "plan_active_d",
@@ -185,6 +185,7 @@ export function proPlansBlock(t, opts) {
             ${plan("monthly")}
             ${plan("yearly")}
           </div>
+          <p class="muted field-note" data-i18n="pay_vat_note">${esc(t("pay_vat_note"))}</p>
           <div data-pw-buy hidden>${go ? `<p>${go}</p>` : ""}${proTermsLine(t, lang, inPlace)}</div>
           <p class="muted" data-pw-soon data-i18n="pay_soon">${esc(t("pay_soon"))}</p>
         </div>`;

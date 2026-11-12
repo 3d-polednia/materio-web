@@ -30,7 +30,7 @@ export default {
     {
       id: "preise",
       h: "5. Preise und Zahlung",
-      html: `<p>Es gelten die Preise, die auf der <a href="/de/liczmat-pro/">LiczMat Pro-Seite</a> und im Checkout zum Zeitpunkt der Bestellung angezeigt werden. Es handelt sich um Endpreise. Weitere Kosten fallen nicht an. Die Abrechnung erfolgt in der im Checkout angezeigten Währung.</p><p>Der Preis wird für den jeweiligen Zeitraum, einen Monat oder ein Jahr, im Voraus berechnet und zu Beginn jedes Zeitraums automatisch mit dem im Checkout gewählten Zahlungsmittel belastet. Es stehen die Zahlungsmethoden zur Verfügung, die im Checkout angeboten werden.</p>`
+      html: `<p>Es gelten die Preise, die auf der <a href="/de/liczmat-pro/">LiczMat Pro-Seite</a> und im Checkout zum Zeitpunkt der Bestellung angezeigt werden. Es handelt sich um Endpreise einschließlich der gesetzlichen Umsatzsteuer. Weitere Kosten fallen nicht an. Die Abrechnung erfolgt in der im Checkout angezeigten Währung.</p><p>Der Preis wird für den jeweiligen Zeitraum, einen Monat oder ein Jahr, im Voraus berechnet und zu Beginn jedes Zeitraums automatisch mit dem im Checkout gewählten Zahlungsmittel belastet. Es stehen die Zahlungsmethoden zur Verfügung, die im Checkout angeboten werden.</p>`
     },
     {
       id: "laufzeit",

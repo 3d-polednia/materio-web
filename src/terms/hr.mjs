@@ -30,7 +30,7 @@ export default {
     {
       id: "preise",
       h: "5. Cijene i plaćanje",
-      html: `<p>Primjenjuju se cijene prikazane na <a href="/hr/liczmat-pro/">stranici LiczMat Pro</a> i na blagajni u trenutku narudžbe. To su konačne cijene. Dodatni troškovi ne nastaju. Obračun se vrši u valuti prikazanoj na blagajni.</p><p>Cijena se naplaćuje unaprijed za odgovarajuće razdoblje, mjesec dana ili godinu dana, i automatski se naplaćuje na početku svakog razdoblja odabranim načinom plaćanja na blagajni. Dostupni su načini plaćanja ponuđeni na blagajni.</p>`
+      html: `<p>Primjenjuju se cijene prikazane na <a href="/hr/liczmat-pro/">stranici LiczMat Pro</a> i na blagajni u trenutku narudžbe. To su konačne cijene koje uključuju zakonski PDV. Dodatni troškovi ne nastaju. Obračun se vrši u valuti prikazanoj na blagajni.</p><p>Cijena se naplaćuje unaprijed za odgovarajuće razdoblje, mjesec dana ili godinu dana, i automatski se naplaćuje na početku svakog razdoblja odabranim načinom plaćanja na blagajni. Dostupni su načini plaćanja ponuđeni na blagajni.</p>`
     },
     {
       id: "laufzeit",

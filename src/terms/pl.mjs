@@ -30,7 +30,7 @@ export default {
     {
       id: "preise",
       h: "5. Ceny i płatność",
-      html: `<p>Obowiązują ceny pokazane na stronie <a href="/liczmat-pro/">LiczMat Pro</a> i w kasie w chwili składania zamówienia. Są to ceny końcowe. Nie pobieramy dodatkowych kosztów. Rozliczenie następuje w walucie pokazanej w kasie.</p><p>Cena jest naliczana z góry za dany okres, miesiąc albo rok, i automatycznie pobierana na początku każdego okresu przy użyciu metody płatności wybranej w kasie. Dostępne są metody płatności oferowane w kasie.</p>`
+      html: `<p>Obowiązują ceny pokazane na stronie <a href="/liczmat-pro/">LiczMat Pro</a> i w kasie w chwili składania zamówienia. Są to ceny końcowe zawierające podatek VAT. Nie pobieramy dodatkowych kosztów. Rozliczenie następuje w walucie pokazanej w kasie.</p><p>Cena jest naliczana z góry za dany okres, miesiąc albo rok, i automatycznie pobierana na początku każdego okresu przy użyciu metody płatności wybranej w kasie. Dostępne są metody płatności oferowane w kasie.</p>`
     },
     {
       id: "laufzeit",

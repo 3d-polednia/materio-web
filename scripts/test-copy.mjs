@@ -503,7 +503,8 @@ const BUDGET = {
   // (hidden until a number is refused, but it is text the visitor can be shown).
   // 2026-11-11: the Pro purchase disclosure is a required line under every buy button;
   // French is widest at 339 words.
-  company: 340, clients: 572, jobs: 544, quotes: 800, calendar: 450,
+  // 2026-11-12: the required VAT-inclusive price note makes French widest at 341 words.
+  company: 341, clients: 572, jobs: 544, quotes: 800, calendar: 450,
   // 2026-10-01: public quote markup is widest in French at 176; four words remain for drift.
   "quote-share": 190,
   // 2026-10-12: the public mail-response page is a short survey form; French is widest at 67 words.

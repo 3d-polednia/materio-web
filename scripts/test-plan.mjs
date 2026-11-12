@@ -221,9 +221,9 @@ head("4. the table and src/ia.mjs agree about what is Pro");
       !proModules(LM_FEATURES).some((m) => m.id === f.id));
     check(`and it still has a name and a line to put on a wall`, Boolean(f.key));
   }
-  eq("the three of them are costs, pdf and the retired jobs redirect",
+  eq("the four of them are costs, pdf, company and the retired jobs redirect",
     LM_FEATURES.filter((f) => f.level === LEVEL.PRO && f.module === false).map((f) => f.id).join(","),
-    "costs,pdf,jobs");
+    "costs,pdf,company,jobs");
   // Chapter XXIV is a path through the other four, not a page. `pdf` is the second: it is
   // offered on /projekty/ and on /kosztorys/ and names neither, which is why proGate()
   // takes a `back` route from the page that draws its wall.

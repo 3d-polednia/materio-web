@@ -30,7 +30,7 @@ export default {
     {
       id: "preise",
       h: "5. Prix et paiement",
-      html: `<p>Les prix applicables sont ceux affichés sur la <a href="/fr/liczmat-pro/">page LiczMat Pro</a> et sur la page de paiement au moment de la commande. Il s'agit de prix définitifs. Aucun frais supplémentaire n'est facturé. La facturation s'effectue dans la devise indiquée lors du paiement.</p><p>Le prix est facturé d'avance pour la période concernée, un mois ou un an, et est prélevé automatiquement au début de chaque période via le moyen de paiement sélectionné. Les modes de paiement proposés lors de la commande sont disponibles.</p>`
+      html: `<p>Les prix applicables sont ceux affichés sur la <a href="/fr/liczmat-pro/">page LiczMat Pro</a> et sur la page de paiement au moment de la commande. Il s'agit de prix définitifs incluant la TVA au taux légal. Aucun frais supplémentaire n'est facturé. La facturation s'effectue dans la devise indiquée lors du paiement.</p><p>Le prix est facturé d'avance pour la période concernée, un mois ou un an, et est prélevé automatiquement au début de chaque période via le moyen de paiement sélectionné. Les modes de paiement proposés lors de la commande sont disponibles.</p>`
     },
     {
       id: "laufzeit",

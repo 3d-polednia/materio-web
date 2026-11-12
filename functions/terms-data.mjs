@@ -29,7 +29,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Ceny i płatność",
-        "html": "<p>Obowiązują ceny pokazane na stronie <a href=\"/liczmat-pro/\">LiczMat Pro</a> i w kasie w chwili składania zamówienia. Są to ceny końcowe. Nie pobieramy dodatkowych kosztów. Rozliczenie następuje w walucie pokazanej w kasie.</p><p>Cena jest naliczana z góry za dany okres, miesiąc albo rok, i automatycznie pobierana na początku każdego okresu przy użyciu metody płatności wybranej w kasie. Dostępne są metody płatności oferowane w kasie.</p>"
+        "html": "<p>Obowiązują ceny pokazane na stronie <a href=\"/liczmat-pro/\">LiczMat Pro</a> i w kasie w chwili składania zamówienia. Są to ceny końcowe zawierające podatek VAT. Nie pobieramy dodatkowych kosztów. Rozliczenie następuje w walucie pokazanej w kasie.</p><p>Cena jest naliczana z góry za dany okres, miesiąc albo rok, i automatycznie pobierana na początku każdego okresu przy użyciu metody płatności wybranej w kasie. Dostępne są metody płatności oferowane w kasie.</p>"
       },
       {
         "id": "laufzeit",
@@ -127,7 +127,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Ціни та оплата",
-        "html": "<p>Застосовуються ціни, вказані на <a href=\"/uk/liczmat-pro/\">сторінці LiczMat Pro</a> та на сторінці оплати на момент замовлення. Це кінцеві ціни. Додаткові витрати відсутні. Розрахунки здійснюються у валюті, що відображається під час оформлення замовлення.</p><p>Оплата нараховується наперед за відповідний період, один місяць або один рік, і автоматично стягується на початку кожного періоду за допомогою способу оплати, обраного під час оформлення. Доступні способи оплати, запропоновані під час оформлення замовлення.</p>"
+        "html": "<p>Застосовуються ціни, вказані на <a href=\"/uk/liczmat-pro/\">сторінці LiczMat Pro</a> та на сторінці оплати на момент замовлення. Це кінцеві ціни, що включають передбачений законом ПДВ. Додаткові витрати відсутні. Розрахунки здійснюються у валюті, що відображається під час оформлення замовлення.</p><p>Оплата нараховується наперед за відповідний період, один місяць або один рік, і автоматично стягується на початку кожного періоду за допомогою способу оплати, обраного під час оформлення. Доступні способи оплати, запропоновані під час оформлення замовлення.</p>"
       },
       {
         "id": "laufzeit",
@@ -225,7 +225,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Preise und Zahlung",
-        "html": "<p>Es gelten die Preise, die auf der <a href=\"/de/liczmat-pro/\">LiczMat Pro-Seite</a> und im Checkout zum Zeitpunkt der Bestellung angezeigt werden. Es handelt sich um Endpreise. Weitere Kosten fallen nicht an. Die Abrechnung erfolgt in der im Checkout angezeigten Währung.</p><p>Der Preis wird für den jeweiligen Zeitraum, einen Monat oder ein Jahr, im Voraus berechnet und zu Beginn jedes Zeitraums automatisch mit dem im Checkout gewählten Zahlungsmittel belastet. Es stehen die Zahlungsmethoden zur Verfügung, die im Checkout angeboten werden.</p>"
+        "html": "<p>Es gelten die Preise, die auf der <a href=\"/de/liczmat-pro/\">LiczMat Pro-Seite</a> und im Checkout zum Zeitpunkt der Bestellung angezeigt werden. Es handelt sich um Endpreise einschließlich der gesetzlichen Umsatzsteuer. Weitere Kosten fallen nicht an. Die Abrechnung erfolgt in der im Checkout angezeigten Währung.</p><p>Der Preis wird für den jeweiligen Zeitraum, einen Monat oder ein Jahr, im Voraus berechnet und zu Beginn jedes Zeitraums automatisch mit dem im Checkout gewählten Zahlungsmittel belastet. Es stehen die Zahlungsmethoden zur Verfügung, die im Checkout angeboten werden.</p>"
       },
       {
         "id": "laufzeit",
@@ -323,7 +323,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Prices and payment",
-        "html": "<p>The prices displayed on the <a href=\"/en/liczmat-pro/\">LiczMat Pro page</a> and in the checkout at the time of the order apply. They are final prices. There are no additional costs. Billing is in the currency displayed in the checkout.</p><p>The price is billed in advance for the relevant period, one month or one year, and is automatically charged at the start of each period using the payment method selected in the checkout. The payment methods offered in the checkout are available.</p>"
+        "html": "<p>The prices displayed on the <a href=\"/en/liczmat-pro/\">LiczMat Pro page</a> and in the checkout at the time of the order apply. These are final prices including statutory VAT. There are no additional costs. Billing is in the currency displayed in the checkout.</p><p>The price is billed in advance for the relevant period, one month or one year, and is automatically charged at the start of each period using the payment method selected in the checkout. The payment methods offered in the checkout are available.</p>"
       },
       {
         "id": "laufzeit",
@@ -421,7 +421,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Ceny a platba",
-        "html": "<p>Platí ceny zobrazené na <a href=\"/cs/liczmat-pro/\">stránce LiczMat Pro</a> a v pokladně v době objednávky. Jedná se o konečné ceny. Další náklady nevznikají. Vyúčtování probíhá v měně zobrazené v pokladně.</p><p>Cena se účtuje předem na příslušné období, jeden měsíc nebo jeden rok, a na začátku každého období je automaticky stržena prostřednictvím platební metody zvolené v pokladně. K dispozici jsou platební metody nabízené v pokladně.</p>"
+        "html": "<p>Platí ceny zobrazené na <a href=\"/cs/liczmat-pro/\">stránce LiczMat Pro</a> a v pokladně v době objednávky. Jedná se o konečné ceny včetně zákonné DPH. Další náklady nevznikají. Vyúčtování probíhá v měně zobrazené v pokladně.</p><p>Cena se účtuje předem na příslušné období, jeden měsíc nebo jeden rok, a na začátku každého období je automaticky stržena prostřednictvím platební metody zvolené v pokladně. K dispozici jsou platební metody nabízené v pokladně.</p>"
       },
       {
         "id": "laufzeit",
@@ -519,7 +519,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Ceny a platba",
-        "html": "<p>Platia ceny zobrazené na <a href=\"/sk/liczmat-pro/\">stránke LiczMat Pro</a> a v pokladni v čase objednávky. Ide o konečné ceny. Žiadne ďalšie náklady nevznikajú. Zúčtovanie prebieha v mene zobrazenej v pokladni.</p><p>Cena sa účtuje vopred na príslušné obdobie, jeden mesiac alebo jeden rok, a na začiatku každého obdobia sa automaticky stiahne prostredníctvom platobnej metódy zvolenej v pokladni. K dispozícii sú platobné metódy ponúkané v pokladni.</p>"
+        "html": "<p>Platia ceny zobrazené na <a href=\"/sk/liczmat-pro/\">stránke LiczMat Pro</a> a v pokladni v čase objednávky. Ide o konečné ceny vrátane zákonnej DPH. Žiadne ďalšie náklady nevznikajú. Zúčtovanie prebieha v mene zobrazenej v pokladni.</p><p>Cena sa účtuje vopred na príslušné obdobie, jeden mesiac alebo jeden rok, a na začiatku každého obdobia sa automaticky stiahne prostredníctvom platobnej metódy zvolenej v pokladni. K dispozícii sú platobné metódy ponúkané v pokladni.</p>"
       },
       {
         "id": "laufzeit",
@@ -617,7 +617,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Prețuri și plată",
-        "html": "<p>Se aplică prețurile afișate pe <a href=\"/ro/liczmat-pro/\">pagina LiczMat Pro</a> și în modulul de finalizare a comenzii la momentul comenzii. Acestea sunt prețuri finale. Nu se percep costuri suplimentare. Facturarea se face în moneda afișată la finalizarea comenzii.</p><p>Prețul este facturat în avans pentru perioada respectivă, o lună sau un an, și este debitat automat la începutul fiecărei perioade prin metoda de plată selectată la finalizarea comenzii. Sunt disponibile metodele de plată oferite la finalizarea comenzii.</p>"
+        "html": "<p>Se aplică prețurile afișate pe <a href=\"/ro/liczmat-pro/\">pagina LiczMat Pro</a> și în modulul de finalizare a comenzii la momentul comenzii. Acestea sunt prețuri finale care includ TVA-ul legal. Nu se percep costuri suplimentare. Facturarea se face în moneda afișată la finalizarea comenzii.</p><p>Prețul este facturat în avans pentru perioada respectivă, o lună sau un an, și este debitat automat la începutul fiecărei perioade prin metoda de plată selectată la finalizarea comenzii. Sunt disponibile metodele de plată oferite la finalizarea comenzii.</p>"
       },
       {
         "id": "laufzeit",
@@ -715,7 +715,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Cijene i plaćanje",
-        "html": "<p>Primjenjuju se cijene prikazane na <a href=\"/hr/liczmat-pro/\">stranici LiczMat Pro</a> i na blagajni u trenutku narudžbe. To su konačne cijene. Dodatni troškovi ne nastaju. Obračun se vrši u valuti prikazanoj na blagajni.</p><p>Cijena se naplaćuje unaprijed za odgovarajuće razdoblje, mjesec dana ili godinu dana, i automatski se naplaćuje na početku svakog razdoblja odabranim načinom plaćanja na blagajni. Dostupni su načini plaćanja ponuđeni na blagajni.</p>"
+        "html": "<p>Primjenjuju se cijene prikazane na <a href=\"/hr/liczmat-pro/\">stranici LiczMat Pro</a> i na blagajni u trenutku narudžbe. To su konačne cijene koje uključuju zakonski PDV. Dodatni troškovi ne nastaju. Obračun se vrši u valuti prikazanoj na blagajni.</p><p>Cijena se naplaćuje unaprijed za odgovarajuće razdoblje, mjesec dana ili godinu dana, i automatski se naplaćuje na početku svakog razdoblja odabranim načinom plaćanja na blagajni. Dostupni su načini plaćanja ponuđeni na blagajni.</p>"
       },
       {
         "id": "laufzeit",
@@ -813,7 +813,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Cene i plaćanje",
-        "html": "<p>Primenjuju se cene prikazane na <a href=\"/sr/liczmat-pro/\">stranici LiczMat Pro</a> i na kasi u trenutku poručivanja. To su konačne cene. Dodatni troškovi ne nastaju. Obračun se vrši u valuti prikazanoj na kasi.</p><p>Cena se naplaćuje unapred za odgovarajući period, mesec dana ili godinu dana, i automatski se naplaćuje na početku svakog perioda putem izabranog načina plaćanja na kasi. Dostupni su načini plaćanja ponuđeni na kasi.</p>"
+        "html": "<p>Primenjuju se cene prikazane na <a href=\"/sr/liczmat-pro/\">stranici LiczMat Pro</a> i na kasi u trenutku poručivanja. To su konačne cene koje uključuju zakonski PDV. Dodatni troškovi ne nastaju. Obračun se vrši u valuti prikazanoj na kasi.</p><p>Cena se naplaćuje unapred za odgovarajući period, mesec dana ili godinu dana, i automatski se naplaćuje na početku svakog perioda putem izabranog načina plaćanja na kasi. Dostupni su načini plaćanja ponuđeni na kasi.</p>"
       },
       {
         "id": "laufzeit",
@@ -911,7 +911,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Prezzi e pagamento",
-        "html": "<p>Si applicano i prezzi indicati sulla <a href=\"/it/liczmat-pro/\">pagina di LiczMat Pro</a> e nella pagina di pagamento al momento dell'ordine. Si tratta di prezzi finali. Non si applicano costi ulteriori. La fatturazione avviene nella valuta mostrata al momento del pagamento.</p><p>Il prezzo viene fatturato anticipatamente per il relativo periodo, un mese o un anno, e viene addebitato automaticamente all'inizio di ciascun periodo tramite il metodo di pagamento selezionato al momento del pagamento. Sono disponibili i metodi di pagamento offerti nel checkout.</p>"
+        "html": "<p>Si applicano i prezzi indicati sulla <a href=\"/it/liczmat-pro/\">pagina di LiczMat Pro</a> e nella pagina di pagamento al momento dell'ordine. Si tratta di prezzi finali comprensivi dell'IVA prevista dalla legge. Non si applicano costi ulteriori. La fatturazione avviene nella valuta mostrata al momento del pagamento.</p><p>Il prezzo viene fatturato anticipatamente per il relativo periodo, un mese o un anno, e viene addebitato automaticamente all'inizio di ciascun periodo tramite il metodo di pagamento selezionato al momento del pagamento. Sono disponibili i metodi di pagamento offerti nel checkout.</p>"
       },
       {
         "id": "laufzeit",
@@ -1009,7 +1009,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Prijzen en betaling",
-        "html": "<p>Van toepassing zijn de prijzen die op het moment van de bestelling op de <a href=\"/nl/liczmat-pro/\">LiczMat Pro-pagina</a> en in de checkout worden getoond. Dit zijn eindprijzen. Er zijn geen bijkomende kosten. Facturering vindt plaats in de valuta die in de checkout wordt getoond.</p><p>De prijs wordt vooraf gefactureerd voor de betreffende periode, één maand of één jaar, en wordt aan het begin van elke periode automatisch afgeschreven via de in de checkout gekozen betaalmethode. De in de checkout aangeboden betaalmethoden zijn beschikbaar.</p>"
+        "html": "<p>Van toepassing zijn de prijzen die op het moment van de bestelling op de <a href=\"/nl/liczmat-pro/\">LiczMat Pro-pagina</a> en in de checkout worden getoond. Dit zijn eindprijzen inclusief de wettelijk verschuldigde btw. Er zijn geen bijkomende kosten. Facturering vindt plaats in de valuta die in de checkout wordt getoond.</p><p>De prijs wordt vooraf gefactureerd voor de betreffende periode, één maand of één jaar, en wordt aan het begin van elke periode automatisch afgeschreven via de in de checkout gekozen betaalmethode. De in de checkout aangeboden betaalmethoden zijn beschikbaar.</p>"
       },
       {
         "id": "laufzeit",
@@ -1107,7 +1107,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Precios y pago",
-        "html": "<p>Se aplican los precios indicados en la <a href=\"/es/liczmat-pro/\">página de LiczMat Pro</a> y en la pantalla de pago en el momento del pedido. Se trata de precios finales. No existen costes adicionales. La facturación se efectúa en la moneda mostrada en la pantalla de pago.</p><p>El precio se factura por adelantado para el período correspondiente, un mes o un año, y se cobra automáticamente al comienzo de cada período mediante el método de pago seleccionado. Se encuentran disponibles los métodos de pago ofrecidos en la pantalla de pago.</p>"
+        "html": "<p>Se aplican los precios indicados en la <a href=\"/es/liczmat-pro/\">página de LiczMat Pro</a> y en la pantalla de pago en el momento del pedido. Se trata de precios finales que incluyen el IVA legalmente aplicable. No existen costes adicionales. La facturación se efectúa en la moneda mostrada en la pantalla de pago.</p><p>El precio se factura por adelantado para el período correspondiente, un mes o un año, y se cobra automáticamente al comienzo de cada período mediante el método de pago seleccionado. Se encuentran disponibles los métodos de pago ofrecidos en la pantalla de pago.</p>"
       },
       {
         "id": "laufzeit",
@@ -1205,7 +1205,7 @@ export const TERMS = Object.freeze({
       {
         "id": "preise",
         "h": "5. Prix et paiement",
-        "html": "<p>Les prix applicables sont ceux affichés sur la <a href=\"/fr/liczmat-pro/\">page LiczMat Pro</a> et sur la page de paiement au moment de la commande. Il s'agit de prix définitifs. Aucun frais supplémentaire n'est facturé. La facturation s'effectue dans la devise indiquée lors du paiement.</p><p>Le prix est facturé d'avance pour la période concernée, un mois ou un an, et est prélevé automatiquement au début de chaque période via le moyen de paiement sélectionné. Les modes de paiement proposés lors de la commande sont disponibles.</p>"
+        "html": "<p>Les prix applicables sont ceux affichés sur la <a href=\"/fr/liczmat-pro/\">page LiczMat Pro</a> et sur la page de paiement au moment de la commande. Il s'agit de prix définitifs incluant la TVA au taux légal. Aucun frais supplémentaire n'est facturé. La facturation s'effectue dans la devise indiquée lors du paiement.</p><p>Le prix est facturé d'avance pour la période concernée, un mois ou un an, et est prélevé automatiquement au début de chaque période via le moyen de paiement sélectionné. Les modes de paiement proposés lors de la commande sont disponibles.</p>"
       },
       {
         "id": "laufzeit",

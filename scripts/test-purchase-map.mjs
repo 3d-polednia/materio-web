@@ -97,6 +97,12 @@ const PLAN_WORD = Object.freeze({
   it: "mensile", nl: "maandelijks", es: "mensual", fr: "mensuel",
 });
 
+const VAT_MARKER = Object.freeze({
+  pl: "z VAT", uk: "з ПДВ", de: "inkl. MwSt.", en: "incl. VAT",
+  cs: "vč. DPH", sk: "vrátane DPH", ro: "TVA inclus", hr: "s PDV-om",
+  sr: "sa PDV-om", it: "IVA inclusa", nl: "incl. btw", es: "IVA incluido", fr: "TTC",
+});
+
 const expectedPrice = (lang, amountMinor, currency) => {
   const formatter = new Intl.NumberFormat(lang, { style: "currency", currency });
   return formatter.format(amountMinor / (10 ** formatter.resolvedOptions().maximumFractionDigits));
@@ -121,6 +127,8 @@ for (const lang of LANGS) {
   ok(mail.html.length > 0, `${lang} HTML exists`);
   for (const [kind, content] of [["text", mail.text], ["html", mail.html]]) {
     ok(content.includes(price), `${lang} ${kind} contains the formatted price`);
+    ok(content.includes(`${price} (${VAT_MARKER[lang]})`),
+      `${lang} ${kind} price line contains the VAT marker`);
     ok(content.includes(PLAN_WORD[lang]), `${lang} ${kind} contains the plan word`);
     for (const field of [ENTITY.name, ENTITY.address, ENTITY.taxId, ENTITY.email]) {
       ok(content.includes(field), `${lang} ${kind} contains seller field ${field}`);

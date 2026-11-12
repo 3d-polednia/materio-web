@@ -30,7 +30,7 @@ export default {
     {
       id: "preise",
       h: "5. Prețuri și plată",
-      html: `<p>Se aplică prețurile afișate pe <a href="/ro/liczmat-pro/">pagina LiczMat Pro</a> și în modulul de finalizare a comenzii la momentul comenzii. Acestea sunt prețuri finale. Nu se percep costuri suplimentare. Facturarea se face în moneda afișată la finalizarea comenzii.</p><p>Prețul este facturat în avans pentru perioada respectivă, o lună sau un an, și este debitat automat la începutul fiecărei perioade prin metoda de plată selectată la finalizarea comenzii. Sunt disponibile metodele de plată oferite la finalizarea comenzii.</p>`
+      html: `<p>Se aplică prețurile afișate pe <a href="/ro/liczmat-pro/">pagina LiczMat Pro</a> și în modulul de finalizare a comenzii la momentul comenzii. Acestea sunt prețuri finale care includ TVA-ul legal. Nu se percep costuri suplimentare. Facturarea se face în moneda afișată la finalizarea comenzii.</p><p>Prețul este facturat în avans pentru perioada respectivă, o lună sau un an, și este debitat automat la începutul fiecărei perioade prin metoda de plată selectată la finalizarea comenzii. Sunt disponibile metodele de plată oferite la finalizarea comenzii.</p>`
     },
     {
       id: "laufzeit",

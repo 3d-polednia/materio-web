@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   BASE, LANGS, urlCancel, urlTerms, urlWithdraw,
 } from "../src/site.mjs";
+import { TERMS } from "../src/terms/index.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const failures = [];
@@ -31,6 +32,17 @@ const groups = [
   ["cancel", urlCancel],
   ["withdraw", urlWithdraw],
 ];
+
+const VAT_WORD = Object.freeze({
+  pl: "VAT", uk: "ПДВ", de: "Umsatzsteuer", en: "VAT", cs: "DPH", sk: "DPH",
+  ro: "TVA", hr: "PDV", sr: "PDV", it: "IVA", nl: "btw", es: "IVA", fr: "TVA",
+});
+
+for (const lang of LANGS) {
+  const prices = TERMS[lang].sections.find((section) => section.id === "preise");
+  check(Boolean(prices && prices.html.includes(VAT_WORD[lang])),
+    `${lang} prices section does not mention ${VAT_WORD[lang]}`);
+}
 
 for (const [kind, url] of groups) {
   for (const lang of LANGS) {

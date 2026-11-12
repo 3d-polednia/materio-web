@@ -89,7 +89,7 @@ const COPY = Object.freeze({
     subject: "Potwierdzenie zamówienia LiczMat Pro",
     thanks: "Dziękujemy za zamówienie LiczMat Pro.", summary: "Podsumowanie umowy",
     product: "Produkt", plan: "Plan", monthly: "miesięczny", yearly: "roczny",
-    price: "Cena", date: "Data zawarcia umowy", customer: "Adres klienta",
+    price: "Cena", priceVat: "z VAT", date: "Data zawarcia umowy", customer: "Adres klienta",
     renewMonthly: "Plan miesięczny odnawia się automatycznie co miesiąc.",
     renewYearly: "Plan roczny odnawia się automatycznie co rok.",
     cancelHow: "Subskrypcję możesz wypowiedzieć w portalu klienta albo na stronie wypowiedzenia.",
@@ -102,7 +102,7 @@ const COPY = Object.freeze({
     subject: "Підтвердження замовлення LiczMat Pro",
     thanks: "Дякуємо за замовлення LiczMat Pro.", summary: "Підсумок договору",
     product: "Продукт", plan: "План", monthly: "щомісячний", yearly: "річний",
-    price: "Ціна", date: "Дата укладення договору", customer: "Адреса клієнта",
+    price: "Ціна", priceVat: "з ПДВ", date: "Дата укладення договору", customer: "Адреса клієнта",
     renewMonthly: "Щомісячний план автоматично поновлюється щомісяця.",
     renewYearly: "Річний план автоматично поновлюється щороку.",
     cancelHow: "Підписку можна припинити в кабінеті клієнта або на сторінці розірвання договору.",
@@ -115,7 +115,7 @@ const COPY = Object.freeze({
     subject: "Bestellbestätigung für LiczMat Pro",
     thanks: "Vielen Dank für Ihre Bestellung von LiczMat Pro.", summary: "Vertragsübersicht",
     product: "Produkt", plan: "Tarif", monthly: "monatlich", yearly: "jährlich",
-    price: "Preis", date: "Datum des Vertragsschlusses", customer: "Kundenadresse",
+    price: "Preis", priceVat: "inkl. MwSt.", date: "Datum des Vertragsschlusses", customer: "Kundenadresse",
     renewMonthly: "Der monatliche Tarif verlängert sich automatisch um jeweils einen Monat.",
     renewYearly: "Der jährliche Tarif verlängert sich automatisch und wird jährlich im Voraus abgerechnet.",
     cancelHow: "Sie können das Abonnement im Kundenportal oder auf der Kündigungsseite kündigen.",
@@ -128,7 +128,7 @@ const COPY = Object.freeze({
     subject: "LiczMat Pro order confirmation",
     thanks: "Thank you for ordering LiczMat Pro.", summary: "Contract summary",
     product: "Product", plan: "Plan", monthly: "monthly", yearly: "yearly",
-    price: "Price", date: "Contract date", customer: "Customer address",
+    price: "Price", priceVat: "incl. VAT", date: "Contract date", customer: "Customer address",
     renewMonthly: "The monthly plan renews automatically every month.",
     renewYearly: "The yearly plan renews automatically every year.",
     cancelHow: "You can cancel the subscription in the customer portal or on the cancellation page.",
@@ -141,7 +141,7 @@ const COPY = Object.freeze({
     subject: "Potvrzení objednávky LiczMat Pro",
     thanks: "Děkujeme za objednávku LiczMat Pro.", summary: "Shrnutí smlouvy",
     product: "Produkt", plan: "Plán", monthly: "měsíční", yearly: "roční",
-    price: "Cena", date: "Datum uzavření smlouvy", customer: "Adresa zákazníka",
+    price: "Cena", priceVat: "vč. DPH", date: "Datum uzavření smlouvy", customer: "Adresa zákazníka",
     renewMonthly: "Měsíční plán se automaticky obnovuje každý měsíc.",
     renewYearly: "Roční plán se automaticky obnovuje každý rok.",
     cancelHow: "Předplatné můžete vypovědět v zákaznickém portálu nebo na stránce pro výpověď.",
@@ -154,7 +154,7 @@ const COPY = Object.freeze({
     subject: "Potvrdenie objednávky LiczMat Pro",
     thanks: "Ďakujeme za objednávku LiczMat Pro.", summary: "Zhrnutie zmluvy",
     product: "Produkt", plan: "Plán", monthly: "mesačný", yearly: "ročný",
-    price: "Cena", date: "Dátum uzavretia zmluvy", customer: "Adresa zákazníka",
+    price: "Cena", priceVat: "vrátane DPH", date: "Dátum uzavretia zmluvy", customer: "Adresa zákazníka",
     renewMonthly: "Mesačný plán sa automaticky obnovuje každý mesiac.",
     renewYearly: "Ročný plán sa automaticky obnovuje každý rok.",
     cancelHow: "Predplatné môžete vypovedať v zákazníckom portáli alebo na stránke výpovede.",
@@ -167,7 +167,7 @@ const COPY = Object.freeze({
     subject: "Confirmarea comenzii LiczMat Pro",
     thanks: "Vă mulțumim pentru comanda LiczMat Pro.", summary: "Rezumatul contractului",
     product: "Produs", plan: "Plan", monthly: "lunar", yearly: "anual",
-    price: "Preț", date: "Data încheierii contractului", customer: "Adresa clientului",
+    price: "Preț", priceVat: "TVA inclus", date: "Data încheierii contractului", customer: "Adresa clientului",
     renewMonthly: "Planul lunar se reînnoiește automat în fiecare lună.",
     renewYearly: "Planul anual se reînnoiește automat în fiecare an.",
     cancelHow: "Puteți rezilia abonamentul în portalul pentru clienți sau pe pagina de reziliere.",
@@ -180,7 +180,7 @@ const COPY = Object.freeze({
     subject: "Potvrda narudžbe LiczMat Pro",
     thanks: "Hvala na narudžbi LiczMat Pro.", summary: "Sažetak ugovora",
     product: "Proizvod", plan: "Plan", monthly: "mjesečni", yearly: "godišnji",
-    price: "Cijena", date: "Datum sklapanja ugovora", customer: "Adresa kupca",
+    price: "Cijena", priceVat: "s PDV-om", date: "Datum sklapanja ugovora", customer: "Adresa kupca",
     renewMonthly: "Mjesečni plan automatski se obnavlja svaki mjesec.",
     renewYearly: "Godišnji plan automatski se obnavlja svake godine.",
     cancelHow: "Pretplatu možete raskinuti u korisničkom portalu ili na stranici za raskid.",
@@ -193,7 +193,7 @@ const COPY = Object.freeze({
     subject: "Potvrda porudžbine LiczMat Pro",
     thanks: "Hvala na porudžbini LiczMat Pro.", summary: "Sažetak ugovora",
     product: "Proizvod", plan: "Plan", monthly: "mesečni", yearly: "godišnji",
-    price: "Cena", date: "Datum zaključenja ugovora", customer: "Adresa kupca",
+    price: "Cena", priceVat: "sa PDV-om", date: "Datum zaključenja ugovora", customer: "Adresa kupca",
     renewMonthly: "Mesečni plan se automatski obnavlja svakog meseca.",
     renewYearly: "Godišnji plan se automatski obnavlja svake godine.",
     cancelHow: "Pretplatu možete otkazati u korisničkom portalu ili na stranici za otkazivanje.",
@@ -206,7 +206,7 @@ const COPY = Object.freeze({
     subject: "Conferma dell'ordine LiczMat Pro",
     thanks: "Grazie per aver ordinato LiczMat Pro.", summary: "Riepilogo del contratto",
     product: "Prodotto", plan: "Piano", monthly: "mensile", yearly: "annuale",
-    price: "Prezzo", date: "Data di conclusione del contratto", customer: "Indirizzo del cliente",
+    price: "Prezzo", priceVat: "IVA inclusa", date: "Data di conclusione del contratto", customer: "Indirizzo del cliente",
     renewMonthly: "Il piano mensile si rinnova automaticamente ogni mese.",
     renewYearly: "Il piano annuale si rinnova automaticamente ogni anno.",
     cancelHow: "Puoi disdire l'abbonamento nel portale clienti o nella pagina di disdetta.",
@@ -219,7 +219,7 @@ const COPY = Object.freeze({
     subject: "Bevestiging van je LiczMat Pro-bestelling",
     thanks: "Bedankt voor je bestelling van LiczMat Pro.", summary: "Samenvatting van de overeenkomst",
     product: "Product", plan: "Abonnement", monthly: "maandelijks", yearly: "jaarlijks",
-    price: "Prijs", date: "Datum van de overeenkomst", customer: "Klantadres",
+    price: "Prijs", priceVat: "incl. btw", date: "Datum van de overeenkomst", customer: "Klantadres",
     renewMonthly: "Het maandabonnement wordt elke maand automatisch verlengd.",
     renewYearly: "Het jaarabonnement wordt elk jaar automatisch verlengd.",
     cancelHow: "Je kunt het abonnement opzeggen in het klantenportaal of op de opzegpagina.",
@@ -232,7 +232,7 @@ const COPY = Object.freeze({
     subject: "Confirmación del pedido de LiczMat Pro",
     thanks: "Gracias por tu pedido de LiczMat Pro.", summary: "Resumen del contrato",
     product: "Producto", plan: "Plan", monthly: "mensual", yearly: "anual",
-    price: "Precio", date: "Fecha de celebración del contrato", customer: "Dirección del cliente",
+    price: "Precio", priceVat: "IVA incluido", date: "Fecha de celebración del contrato", customer: "Dirección del cliente",
     renewMonthly: "El plan mensual se renueva automáticamente cada mes.",
     renewYearly: "El plan anual se renueva automáticamente cada año.",
     cancelHow: "Puedes cancelar la suscripción en el portal del cliente o en la página de cancelación.",
@@ -245,7 +245,7 @@ const COPY = Object.freeze({
     subject: "Confirmation de commande LiczMat Pro",
     thanks: "Merci pour votre commande LiczMat Pro.", summary: "Résumé du contrat",
     product: "Produit", plan: "Formule", monthly: "mensuel", yearly: "annuel",
-    price: "Prix", date: "Date de conclusion du contrat", customer: "Adresse du client",
+    price: "Prix", priceVat: "TTC", date: "Date de conclusion du contrat", customer: "Adresse du client",
     renewMonthly: "La formule mensuelle est renouvelée automatiquement chaque mois.",
     renewYearly: "La formule annuelle est renouvelée automatiquement chaque année.",
     cancelHow: "Vous pouvez résilier l'abonnement dans le portail client ou sur la page de résiliation.",
@@ -413,7 +413,7 @@ export function purchaseMail({ lang, plan, amountMinor, currency, createdMs, ema
 ${c.summary}
 ${c.product}: LiczMat Pro
 ${c.plan}: ${planWord}
-${c.price}: ${price}
+${c.price}: ${price} (${c.priceVat})
 ${c.date}: ${concluded}
 ${c.customer}: ${email}
 
@@ -448,7 +448,7 @@ ${absoluteLinks(section.html)}
 </section>`).join("\n");
   const bodyHtml = `<p style="font-size:16px;margin:0 0 20px 0;">${escapeHtml(c.thanks)}</p>
 <h2 style="font-size:20px;margin:0 0 12px 0;">${escapeHtml(c.summary)}</h2>
-<p style="font-size:16px;margin:0 0 20px 0;"><strong>${escapeHtml(c.product)}:</strong> LiczMat Pro<br><strong>${escapeHtml(c.plan)}:</strong> ${escapeHtml(planWord)}<br><strong>${escapeHtml(c.price)}:</strong> ${escapeHtml(price)}<br><strong>${escapeHtml(c.date)}:</strong> ${escapeHtml(concluded)}<br><strong>${escapeHtml(c.customer)}:</strong> ${escapeHtml(email)}</p>
+<p style="font-size:16px;margin:0 0 20px 0;"><strong>${escapeHtml(c.product)}:</strong> LiczMat Pro<br><strong>${escapeHtml(c.plan)}:</strong> ${escapeHtml(planWord)}<br><strong>${escapeHtml(c.price)}:</strong> ${escapeHtml(price)} (${escapeHtml(c.priceVat)})<br><strong>${escapeHtml(c.date)}:</strong> ${escapeHtml(concluded)}<br><strong>${escapeHtml(c.customer)}:</strong> ${escapeHtml(email)}</p>
 <p style="font-size:16px;margin:0 0 20px 0;">${escapeHtml(renewal)} ${escapeHtml(c.cancelHow)}<br><a href="https://liczmat.com/app/" style="color:#0056b3;text-decoration:underline;">https://liczmat.com/app/</a><br><a href="${escapeHtml(urls.cancel)}" style="color:#0056b3;text-decoration:underline;">${escapeHtml(urls.cancel)}</a></p>
 <p style="font-size:16px;margin:0 0 20px 0;"><strong>${escapeHtml(c.seller)}:</strong><br>${escapeHtml(ENTITY.name)}<br>${escapeHtml(ENTITY.address)}<br><a href="mailto:${escapeHtml(ENTITY.email)}" style="color:#0056b3;text-decoration:underline;">${escapeHtml(ENTITY.email)}</a><br>${escapeHtml(c.vat)}: ${escapeHtml(ENTITY.taxId)}</p>
 <h2 style="font-size:20px;margin:0 0 12px 0;">${escapeHtml(c.links)}</h2>

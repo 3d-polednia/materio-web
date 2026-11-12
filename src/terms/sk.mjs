@@ -30,7 +30,7 @@ export default {
     {
       id: "preise",
       h: "5. Ceny a platba",
-      html: `<p>Platia ceny zobrazené na <a href="/sk/liczmat-pro/">stránke LiczMat Pro</a> a v pokladni v čase objednávky. Ide o konečné ceny. Žiadne ďalšie náklady nevznikajú. Zúčtovanie prebieha v mene zobrazenej v pokladni.</p><p>Cena sa účtuje vopred na príslušné obdobie, jeden mesiac alebo jeden rok, a na začiatku každého obdobia sa automaticky stiahne prostredníctvom platobnej metódy zvolenej v pokladni. K dispozícii sú platobné metódy ponúkané v pokladni.</p>`
+      html: `<p>Platia ceny zobrazené na <a href="/sk/liczmat-pro/">stránke LiczMat Pro</a> a v pokladni v čase objednávky. Ide o konečné ceny vrátane zákonnej DPH. Žiadne ďalšie náklady nevznikajú. Zúčtovanie prebieha v mene zobrazenej v pokladni.</p><p>Cena sa účtuje vopred na príslušné obdobie, jeden mesiac alebo jeden rok, a na začiatku každého obdobia sa automaticky stiahne prostredníctvom platobnej metódy zvolenej v pokladni. K dispozícii sú platobné metódy ponúkané v pokladni.</p>`
     },
     {
       id: "laufzeit",
