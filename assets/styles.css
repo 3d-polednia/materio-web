@@ -952,6 +952,8 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .field > .fld-label, .field > label, .ws-bar-label { padding-inline: var(--control-px); }
 /* Field feedback follows the label and control text column. */
 .field > .form-error, .field > .muted { padding-inline: var(--control-px); }
+/* A hint is a span; inline, its padding indented only the first line of a wrapped hint. */
+.field > .muted { display: block; }
 /* A money suffix stays inside the field edge without becoming part of the typed amount. */
 .field-affix { display: block; position: relative; }
 /* The suffix sits at the logical end for every language and never catches a field click. */

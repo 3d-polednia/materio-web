@@ -20,6 +20,7 @@ const LOCALE = Object.freeze({
 
 const COPY = Object.freeze({
   pl: {
+    team: "Zespół LiczMat", product: "LiczMat Pro (subskrypcja)",
     cancelSubject: "Potwierdzenie otrzymania wypowiedzenia", withdrawSubject: "Potwierdzenie otrzymania odstąpienia od umowy",
     cancelIntro: "Potwierdzamy otrzymanie wypowiedzenia umowy.", withdrawIntro: "Potwierdzamy otrzymanie odstąpienia od umowy.",
     kind: "Rodzaj", cancel: "wypowiedzenie", withdraw: "odstąpienie od umowy", name: "Imię i nazwisko", email: "E-mail", contract: "Umowa",
@@ -28,6 +29,7 @@ const COPY = Object.freeze({
     refund: "Pełna kwota zostanie zwrócona w ciągu 14 dni.",
   },
   uk: {
+    team: "Команда LiczMat", product: "LiczMat Pro (підписка)",
     cancelSubject: "Підтвердження отримання розірвання договору", withdrawSubject: "Підтвердження отримання відмови від договору",
     cancelIntro: "Підтверджуємо отримання заяви про розірвання договору.", withdrawIntro: "Підтверджуємо отримання заяви про відмову від договору.",
     kind: "Вид", cancel: "розірвання договору", withdraw: "відмова від договору", name: "Ім'я та прізвище", email: "Електронна пошта", contract: "Договір",
@@ -36,6 +38,7 @@ const COPY = Object.freeze({
     refund: "Повну суму буде повернено протягом 14 днів.",
   },
   de: {
+    team: "Ihr LiczMat-Team", product: "LiczMat Pro (Abonnement)",
     cancelSubject: "Bestätigung des Eingangs Ihrer Kündigung", withdrawSubject: "Bestätigung des Eingangs Ihres Widerrufs",
     cancelIntro: "Wir bestätigen den Eingang Ihrer Kündigung.", withdrawIntro: "Wir bestätigen den Eingang Ihres Widerrufs.",
     kind: "Art", cancel: "Kündigung", withdraw: "Widerruf", name: "Name", email: "E-Mail", contract: "Vertrag",
@@ -44,6 +47,7 @@ const COPY = Object.freeze({
     refund: "Der vollständige Betrag wird innerhalb von 14 Tagen zurückgezahlt.",
   },
   en: {
+    team: "The LiczMat team", product: "LiczMat Pro (subscription)",
     cancelSubject: "Confirmation of receipt of your cancellation", withdrawSubject: "Confirmation of receipt of your withdrawal",
     cancelIntro: "We confirm receipt of your contract cancellation.", withdrawIntro: "We confirm receipt of your withdrawal from the contract.",
     kind: "Kind", cancel: "contract cancellation", withdraw: "withdrawal", name: "Name", email: "Email", contract: "Contract",
@@ -52,6 +56,7 @@ const COPY = Object.freeze({
     refund: "The full amount will be refunded within 14 days.",
   },
   cs: {
+    team: "Tým LiczMat", product: "LiczMat Pro (předplatné)",
     cancelSubject: "Potvrzení přijetí výpovědi", withdrawSubject: "Potvrzení přijetí odstoupení od smlouvy",
     cancelIntro: "Potvrzujeme přijetí výpovědi smlouvy.", withdrawIntro: "Potvrzujeme přijetí odstoupení od smlouvy.",
     kind: "Druh", cancel: "výpověď", withdraw: "odstoupení od smlouvy", name: "Jméno", email: "E-mail", contract: "Smlouva",
@@ -60,6 +65,7 @@ const COPY = Object.freeze({
     refund: "Celá částka bude vrácena do 14 dnů.",
   },
   sk: {
+    team: "Tím LiczMat", product: "LiczMat Pro (predplatné)",
     cancelSubject: "Potvrdenie prijatia výpovede", withdrawSubject: "Potvrdenie prijatia odstúpenia od zmluvy",
     cancelIntro: "Potvrdzujeme prijatie výpovede zmluvy.", withdrawIntro: "Potvrdzujeme prijatie odstúpenia od zmluvy.",
     kind: "Druh", cancel: "výpoveď", withdraw: "odstúpenie od zmluvy", name: "Meno", email: "E-mail", contract: "Zmluva",
@@ -68,6 +74,7 @@ const COPY = Object.freeze({
     refund: "Celá suma bude vrátená do 14 dní.",
   },
   ro: {
+    team: "Echipa LiczMat", product: "LiczMat Pro (abonament)",
     cancelSubject: "Confirmarea primirii rezilierii", withdrawSubject: "Confirmarea primirii retragerii din contract",
     cancelIntro: "Confirmăm primirea cererii de reziliere a contractului.", withdrawIntro: "Confirmăm primirea retragerii din contract.",
     kind: "Tip", cancel: "reziliere", withdraw: "retragere din contract", name: "Nume", email: "E-mail", contract: "Contract",
@@ -76,6 +83,7 @@ const COPY = Object.freeze({
     refund: "Suma integrală va fi rambursată în termen de 14 zile.",
   },
   hr: {
+    team: "Tim LiczMat", product: "LiczMat Pro (pretplata)",
     cancelSubject: "Potvrda primitka raskida ugovora", withdrawSubject: "Potvrda primitka odustanka od ugovora",
     cancelIntro: "Potvrđujemo primitak raskida ugovora.", withdrawIntro: "Potvrđujemo primitak odustanka od ugovora.",
     kind: "Vrsta", cancel: "raskid ugovora", withdraw: "odustanak od ugovora", name: "Ime", email: "E-mail", contract: "Ugovor",
@@ -84,6 +92,7 @@ const COPY = Object.freeze({
     refund: "Puni iznos bit će vraćen u roku od 14 dana.",
   },
   sr: {
+    team: "Tim LiczMat", product: "LiczMat Pro (pretplata)",
     cancelSubject: "Potvrda prijema raskida ugovora", withdrawSubject: "Potvrda prijema odustanka od ugovora",
     cancelIntro: "Potvrđujemo prijem raskida ugovora.", withdrawIntro: "Potvrđujemo prijem odustanka od ugovora.",
     kind: "Vrsta", cancel: "raskid ugovora", withdraw: "odustanak od ugovora", name: "Ime", email: "E-pošta", contract: "Ugovor",
@@ -92,6 +101,7 @@ const COPY = Object.freeze({
     refund: "Pun iznos će biti vraćen u roku od 14 dana.",
   },
   it: {
+    team: "Il team LiczMat", product: "LiczMat Pro (abbonamento)",
     cancelSubject: "Conferma di ricezione della disdetta", withdrawSubject: "Conferma di ricezione del recesso",
     cancelIntro: "Confermiamo di aver ricevuto la disdetta del contratto.", withdrawIntro: "Confermiamo di aver ricevuto il recesso dal contratto.",
     kind: "Tipo", cancel: "disdetta", withdraw: "recesso", name: "Nome", email: "E-mail", contract: "Contratto",
@@ -100,6 +110,7 @@ const COPY = Object.freeze({
     refund: "L'intero importo sarà rimborsato entro 14 giorni.",
   },
   nl: {
+    team: "Het LiczMat-team", product: "LiczMat Pro (abonnement)",
     cancelSubject: "Bevestiging van ontvangst van je opzegging", withdrawSubject: "Bevestiging van ontvangst van je herroeping",
     cancelIntro: "We bevestigen de ontvangst van je opzegging.", withdrawIntro: "We bevestigen de ontvangst van je herroeping.",
     kind: "Soort", cancel: "opzegging", withdraw: "herroeping", name: "Naam", email: "E-mail", contract: "Contract",
@@ -108,6 +119,7 @@ const COPY = Object.freeze({
     refund: "Het volledige bedrag wordt binnen 14 dagen terugbetaald.",
   },
   es: {
+    team: "El equipo de LiczMat", product: "LiczMat Pro (suscripción)",
     cancelSubject: "Confirmación de recepción de la cancelación", withdrawSubject: "Confirmación de recepción del desistimiento",
     cancelIntro: "Confirmamos la recepción de la cancelación del contrato.", withdrawIntro: "Confirmamos la recepción del desistimiento del contrato.",
     kind: "Tipo", cancel: "cancelación", withdraw: "desistimiento", name: "Nombre", email: "Correo electrónico", contract: "Contrato",
@@ -116,6 +128,7 @@ const COPY = Object.freeze({
     refund: "El importe íntegro se reembolsará en un plazo de 14 días.",
   },
   fr: {
+    team: "L’équipe LiczMat", product: "LiczMat Pro (abonnement)",
     cancelSubject: "Confirmation de réception de la résiliation", withdrawSubject: "Confirmation de réception de la rétractation",
     cancelIntro: "Nous confirmons la réception de la résiliation du contrat.", withdrawIntro: "Nous confirmons la réception de la rétractation du contrat.",
     kind: "Type", cancel: "résiliation", withdraw: "rétractation", name: "Nom", email: "E-mail", contract: "Contrat",
@@ -218,7 +231,7 @@ export function customerMail(notice, receivedAtMs, planValidUntilMs = null) {
     `${c.kind}: ${cancel ? c.cancel : c.withdraw}`,
     `${c.name}: ${notice.name}`,
     `${c.email}: ${notice.email}`,
-    `${c.contract}: LiczMat Pro (Abonnement)`,
+    `${c.contract}: ${c.product}`,
   ];
 
   if (cancel) {
@@ -237,7 +250,7 @@ export function customerMail(notice, receivedAtMs, planValidUntilMs = null) {
     lines.push(c.refund);
   }
 
-  lines.push("", ENTITY.name, ENTITY.address, ENTITY.email);
+  lines.push("", c.team, "liczmat.com", ENTITY.email);
   return {
     subject: cancel ? c.cancelSubject : c.withdrawSubject,
     text: lines.join("\n"),
@@ -255,7 +268,7 @@ export function ownerMail(notice, receivedAtMs, account = null) {
     `Rodzaj: ${cancel ? "wypowiedzenie" : "odstąpienie"}`,
     `Imię i nazwisko: ${notice.name}`,
     `E-mail: ${notice.email}`,
-    "Umowa: LiczMat Pro (Abonnement)",
+    "Umowa: LiczMat Pro (subskrypcja)",
     `Data wpływu: ${new Date(receivedAtMs).toISOString()}`,
   ];
 

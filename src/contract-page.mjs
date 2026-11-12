@@ -81,7 +81,6 @@ export function contractMain(lang, t, kind) {
   ]);
   const intro = cancel
     ? rich(t("contract_cancel_intro"), {
-      entity: `<strong>${esc(ENTITY.name)}</strong>`,
       portal: `<a href="/app/">${esc(t("contract_portal"))}</a>`,
     })
     : rich(t("contract_withdraw_intro"), {
