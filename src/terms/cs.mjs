@@ -95,7 +95,7 @@ export default {
     {
       id: "schluss",
       h: "18. Závěrečná ustanovení",
-      html: `<p>Platí německé právo s vyloučením Úmluvy OSN o smlouvách o mezinárodní koupi zboží. U spotřebitelů tato volba práva nezbavuje ochrany poskytované kogentními ustanoveními státu jejich obvyklého pobytu.</p><p>Pro obchodníky, právnické osoby veřejného práva a zvláštní fondy veřejného práva je příslušným soudem soud v sídle poskytovatele.</p><p>Pokud je nebo se stane kterékoli ustanovení této smlouvy neplatným, zůstávají zbývající ustanovení v platnosti.</p><p>Závazná je německá verze. Překlady slouží pouze pro informaci.</p>`
+      html: `<p>Platí německé právo s vyloučením Úmluvy OSN o smlouvách o mezinárodní koupi zboží. U spotřebitelů platí tato volba práva pouze v rozsahu, v jakém nezbavuje spotřebitele ochrany poskytované kogentními ustanoveními státu jeho obvyklého pobytu.</p><p>Pro obchodníky, právnické osoby veřejného práva a zvláštní fondy veřejného práva je příslušným soudem soud v sídle poskytovatele.</p><p>Pokud je nebo se stane kterékoli ustanovení této smlouvy neplatným, zůstávají zbývající ustanovení v platnosti.</p><p>Závazná je německá verze. Překlady slouží pouze pro informaci.</p>`
     }
   ]
 };

@@ -389,14 +389,13 @@ head("8. the function is deployed, not published — and carries no secret");
   for (const path of ["functions", "firebase.json", ".firebaserc"]) {
     check(`${path} is dropped from the published site`, dropped.split(/\s+/).includes(path), dropped);
   }
-  /* 2026-11-11: the build WRITES one generated file into functions/ (site-entity.mjs, the
-     seller data the contract and welcome mails sign with, since functions/ is deployed as its
-     own tree and cannot import src/site.mjs). It still never reads anything from there. */
+  /* The build writes only the two generated inputs that functions/ cannot import from src/:
+     seller data and the already interpolated terms. It still never reads functions/. */
   const build = read("scripts/build.mjs");
   check("the generator does not read functions/",
-    build.replace(/write\("functions\/site-entity\.mjs"/g, "").split("\n")
+    build.replace(/write\("functions\/(?:site-entity|terms-data)\.mjs"/g, "").split("\n")
       .filter((line) => line.includes("functions/") && !/^\s*(\/\*|\*|\/\/)/.test(line)).length === 0,
-    "build.mjs touches functions/ beyond writing site-entity.mjs");
+    "build.mjs touches functions/ beyond the two generated writes");
 
   /* One secret, and it is fetched at runtime rather than written down. */
   check("the webhook secret is a Secret Manager parameter",
@@ -428,6 +427,15 @@ head("8. the function is deployed, not published — and carries no secret");
      taken from the signature on it and from nowhere else — a bare uid, which is what a
      tampered URL carries, resolves to nothing. functions/pay-ticket.mjs is the ticket
      itself and scripts/test-pay-ticket.mjs is what proves it refuses the rest. */
+  const purchaseWrappers = [...index.matchAll(
+    /try\s*\{\s*await sendPurchaseConfirmation\([^;]+;\s*\}\s*catch\s*\([^)]*\)\s*\{([\s\S]*?)\n\s*\}/g,
+  )];
+  eq("both checkout paths wrap the purchase confirmation", purchaseWrappers.length, 2);
+  check("a purchase mail failure cannot answer Stripe from its catch",
+    purchaseWrappers.every((match) => !match[1].includes("res.status")));
+  check("the Stripe function can read the SMTP secret",
+    /secrets:\s*\[STRIPE_WEBHOOK_SECRET, PAY_TICKET_SECRET, SMTP_PASSWORD\]/.test(index));
+
   check("the uid comes off a signed ticket, never off the URL as it stands",
     index.includes("readTicket(intent.uid") && !index.includes("auth.getUser(intent.uid)"));
   check("and the account behind the ticket still has to exist",

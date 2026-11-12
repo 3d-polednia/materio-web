@@ -81,6 +81,7 @@ import {
 import {
   customerMail, limitDecision as contractLimitDecision, ownerMail, validateNotice,
 } from "./contract-map.mjs";
+import { purchaseDecision, purchaseLang, purchaseMail } from "./purchase-map.mjs";
 import { ENTITY } from "./site-entity.mjs";
 import {
   SERVER_PROFILE_DELAY_MS, TRIAL_DAYS, firstAppWrite, serverProfileDoc,
@@ -140,13 +141,13 @@ initializeApp();
 const REGION = "europe-central2";
 
 /** Wspolny transport skrzynki OVH dla wszystkich wiadomosci konta. */
-async function sendMail({ to, subject, text, html, headers }) {
+async function sendMail({ to, subject, text, html, headers, attachments }) {
   const transporter = nodemailer.createTransport({
     host: "ssl0.ovh.net", port: 465, secure: true,
     auth: { user: WELCOME_REPLY_TO, pass: SMTP_PASSWORD.value() }
   });
   await transporter.sendMail({
-    from: WELCOME_FROM, replyTo: WELCOME_REPLY_TO, to, subject, text, html, headers
+    from: WELCOME_FROM, replyTo: WELCOME_REPLY_TO, to, subject, text, html, headers, attachments
   });
 }
 
@@ -183,7 +184,7 @@ const toFirestore = (write) => {
 export const stripeWebhook = onRequest(
   {
     region: REGION,
-    secrets: [STRIPE_WEBHOOK_SECRET, PAY_TICKET_SECRET],
+    secrets: [STRIPE_WEBHOOK_SECRET, PAY_TICKET_SECRET, SMTP_PASSWORD],
     cors: false,
     maxInstances: 10,
   },
@@ -232,6 +233,7 @@ export const stripeWebhook = onRequest(
       }
 
       if (intent.action === "link") {
+        const object = event.data.object;
         const uid = await resolveUid(intent);
         if (!uid) {
           /* Zapłata, której nie da się przypisać do konta. Ponawianie nic nie da — uid
@@ -241,12 +243,22 @@ export const stripeWebhook = onRequest(
             type: intent.type, customerId: intent.customerId,
             clientReferenceId: intent.uid, email: intent.email,
           });
+          try {
+            await sendPurchaseConfirmation(object, null);
+          } catch (error) {
+            logger.error("purchase-mail: unexpected error", { sessionId: object && object.id });
+          }
           res.status(200).send("unattributed");
           return;
         }
         await db.collection("stripeCustomers").doc(intent.customerId)
           .set({ uid, email: intent.email || null, updatedAt: Date.now() }, { merge: true });
         logger.info("stripe: klient powiązany z kontem", { customerId: intent.customerId, uid });
+        try {
+          await sendPurchaseConfirmation(object, uid);
+        } catch (error) {
+          logger.error("purchase-mail: unexpected error", { sessionId: object && object.id });
+        }
         res.status(200).send("linked");
         return;
       }
@@ -406,6 +418,66 @@ async function resolveUid(intent) {
     }
   }
   return null;
+}
+
+/**
+ * Send the durable-medium confirmation once per Checkout Session.
+ *
+ * Every failure is contained here because mail is a side effect of an already accepted
+ * payment. It must never change the status or body returned to Stripe.
+ */
+async function sendPurchaseConfirmation(session, uid) {
+  let decision;
+  try {
+    decision = purchaseDecision(session, { liveMode: stripeConfig().liveMode });
+  } catch (error) {
+    logger.error("purchase-mail: decision failed", { sessionId: session && session.id });
+    return;
+  }
+  if (!decision.send) {
+    logger.info("purchase-mail: skipped", {
+      sessionId: session && session.id, reason: decision.reason,
+    });
+    return;
+  }
+
+  const db = getFirestore();
+  const now = Date.now();
+  const markerRef = db.collection("purchaseMails").doc(decision.sessionId);
+  try {
+    await markerRef.create({
+      sentAt: null,
+      createdAt: now,
+      expiresAt: new Date(now + 400 * 24 * 60 * 60 * 1000),
+    });
+  } catch (error) {
+    if (error && (error.code === 6 || error.code === "already-exists")) return;
+    logger.error("purchase-mail: marker failed", { sessionId: decision.sessionId });
+    return;
+  }
+
+  try {
+    let profile = null;
+    if (uid) {
+      const profileSnap = await db.collection("users").doc(uid).get();
+      profile = profileSnap.exists ? profileSnap.data() : null;
+    }
+    const lang = purchaseLang(profile, session);
+    const mail = purchaseMail({
+      lang,
+      plan: decision.plan,
+      amountMinor: decision.amountMinor,
+      currency: decision.currency,
+      createdMs: decision.createdMs,
+      email: decision.email,
+    });
+    await sendMail({ to: decision.email, ...mail });
+    await markerRef.update({ sentAt: Date.now(), lang });
+    logger.info("purchase-mail: sent", { sessionId: decision.sessionId, lang });
+  } catch (error) {
+    await markerRef.delete().catch(() => {});
+    logger.error("purchase-mail: send failed", { sessionId: decision.sessionId });
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

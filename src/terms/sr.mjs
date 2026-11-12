@@ -80,7 +80,7 @@ export default {
     {
       id: "agb-aenderung",
       h: "15. Izmene ovih Uslova",
-      html: `<p>Izmene ovih Opštih uslova poslovanja primenjuju se na tekući ugovor samo uz vaš izričit pristanak. Obaveštavamo vas najmanje 30 dana unapred. Bez vašeg pristanka i dalje se primjenjuju prethodni uslovi. Bilo koja strana može prekinuti pretplatu na kraju već plaćenog perioda.</p>`
+      html: `<p>Izmene ovih Opštih uslova poslovanja primenjuju se na tekući ugovor samo uz vaš izričit pristanak. Obaveštavamo vas najmanje 30 dana unapred. Bez vašeg pristanka i dalje se primenjuju prethodni uslovi. Bilo koja strana može prekinuti pretplatu na kraju već plaćenog perioda.</p>`
     },
     {
       id: "datenschutz",
@@ -95,7 +95,7 @@ export default {
     {
       id: "schluss",
       h: "18. Završne odredbe",
-      html: `<p>Primenjuje se nemačko pravo uz isključenje Konvencije Ujedinjenih nacija o ugovorima o međunarodnoj prodaji robe. Za potrošače ovaj izbor prava ne uskraćuje zaštitu koju pružaju imperativne odredbe države njihovog uobičajenog boravišta.</p><p>Za trgovce, pravna lica javnog prava i posebne fondove javnog prava, sedište pružaoca usluge je mesto nadležnog suda.</p><p>Ako bilo koja odredba ovog ugovora jeste ili postane nevažeća, preostale odredbe ostaju na snazi.</p><p>Nemačka verzija je obavezujuća. Prevodi služe samo u informativne svrhe.</p>`
+      html: `<p>Primenjuje se nemačko pravo uz isključenje Konvencije Ujedinjenih nacija o ugovorima o međunarodnoj prodaji robe. Za potrošače ovaj izbor prava važi samo u meri u kojoj im ne uskraćuje zaštitu koju pružaju imperativne odredbe države njihovog uobičajenog boravišta.</p><p>Za trgovce, pravna lica javnog prava i posebne fondove javnog prava, sedište pružaoca usluge je mesto nadležnog suda.</p><p>Ako bilo koja odredba ovog ugovora jeste ili postane nevažeća, preostale odredbe ostaju na snazi.</p><p>Nemačka verzija je obavezujuća. Prevodi služe samo u informativne svrhe.</p>`
     }
   ]
 };

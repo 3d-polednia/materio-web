@@ -25,7 +25,7 @@ export default {
     {
       id: "vertrag",
       h: "4. Sklapanje ugovora",
-      html: `<p>Prikaz usluge LiczMat Pro na web stranici ne predstavlja obvezujuću ponudu za sklapanje ugovora.</p><p>Za narudžbu se prijavljujete na adresi <a href="/app/">liczmat.com/app/</a>, odabirete mjesečnu ili godišnju pretplatu i kliknete na gumb za kupnju. Preusmjeravaju se na stranicu za naplatu Stripe. Tamo unosite svoju adresu e-pošte i podatke o plaćanju. Prije konačnog klika možete provjeriti i ispraviti sve unesene podatke. Ugovor je sklopljen kada kliknete na gumb za pretplatu s obvezom plaćanja.</p><p>Pružatelj usluga plaćanja je Stripe Payments Europe, Limited (Irska). Stripe potvrđuje ugovor e-poštom.</p><p>Ugovor se može sklopiti na bilo kojem od 13 jezika ponuđenih na web stranici. Njemačka verzija je obvezujuća. Ne pohranjujemo tekst ugovora zasebno. Ovi Opći uvjeti poslovanja dostupni su u svakom trenutku na ovoj adresi i mogu se spremiti ili ispisati. Potvrde o plaćanju i računi dostupni su na korisničkom portalu Stripe.</p>`
+      html: `<p>Prikaz usluge LiczMat Pro na web stranici ne predstavlja obvezujuću ponudu za sklapanje ugovora.</p><p>Za narudžbu se prijavljujete na adresi <a href="/app/">liczmat.com/app/</a>, odabirete mjesečnu ili godišnju pretplatu i kliknete na gumb za kupnju. Bit ćete preusmjereni na stranicu za naplatu Stripe. Tamo unosite svoju adresu e-pošte i podatke o plaćanju. Prije konačnog klika možete provjeriti i ispraviti sve unesene podatke. Ugovor je sklopljen kada kliknete na gumb za pretplatu s obvezom plaćanja.</p><p>Pružatelj usluga plaćanja je Stripe Payments Europe, Limited (Irska). Stripe potvrđuje ugovor e-poštom.</p><p>Ugovor se može sklopiti na bilo kojem od 13 jezika ponuđenih na web stranici. Njemačka verzija je obvezujuća. Ne pohranjujemo tekst ugovora zasebno. Ovi Opći uvjeti poslovanja dostupni su u svakom trenutku na ovoj adresi i mogu se spremiti ili ispisati. Potvrde o plaćanju i računi dostupni su na korisničkom portalu Stripe.</p>`
     },
     {
       id: "preise",
@@ -95,7 +95,7 @@ export default {
     {
       id: "schluss",
       h: "18. Završne odredbe",
-      html: `<p>Primjenjuje se njemačko pravo uz isključenje Konvencije Ujedinjenih naroda o ugovorima o međunarodnoj prodaji robe. Za potrošače ovaj izbor mjerodavnog prava ne uskraćuje zaštitu koju pružaju prisilne odredbe države njihova uobičajenog boravišta.</p><p>Za trgovce, pravne osobe javnog prava i posebna tijela javnog prava, sjedište davatelja usluge je mjesto nadležnog suda.</p><p>Ako bilo koja odredba ovog ugovora jest ili postane nevaljana, preostale odredbe ostaju na snazi.</p><p>Njemačka verzija je obvezujuća. Prijevodi služe samo u informativne svrhe.</p>`
+      html: `<p>Primjenjuje se njemačko pravo uz isključenje Konvencije Ujedinjenih naroda o ugovorima o međunarodnoj prodaji robe. Za potrošače ovaj izbor mjerodavnog prava primjenjuje se samo u mjeri u kojoj im ne uskraćuje zaštitu koju pružaju prisilne odredbe države njihova uobičajenog boravišta.</p><p>Za trgovce, pravne osobe javnog prava i posebna tijela javnog prava, sjedište davatelja usluge je mjesto nadležnog suda.</p><p>Ako bilo koja odredba ovog ugovora jest ili postane nevaljana, preostale odredbe ostaju na snazi.</p><p>Njemačka verzija je obvezujuća. Prijevodi služe samo u informativne svrhe.</p>`
     }
   ]
 };

@@ -34,7 +34,8 @@ const admin = block("export const adminMail");
 check("admin callable", admin.includes("onCall("));
 check("admin secret", admin.includes("secrets: [SMTP_PASSWORD]"));
 check("admin verifies claim", admin.includes("isAdmin(request.auth.token)"));
-check("sendMail accepts headers", /async function sendMail\(\{ to, subject, text, html, headers \}\)/.test(source));
+// 2026-11-12: the purchase confirmation added an optional attachments field after headers.
+check("sendMail accepts headers", /async function sendMail\(\{ to, subject, text, html, headers(, attachments)? \}\)/.test(source));
 check("sendMail forwards headers", /to, subject, text, html, headers/.test(source));
 
 if (failures.length) {
