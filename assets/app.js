@@ -671,6 +671,9 @@ function applyProfile(data) {
   const moved = level !== state.level;
   state.level = level;
   lmWriteLevel(level);
+  // The same answer the account pages get from assets/account-sync-page.js: a Pro action
+  // waiting on lmConfirmedLevel() on this page goes ahead on the level the server keeps.
+  if (typeof lmConfirmLevel === "function") lmConfirmLevel(level);
   // The identity bar names the level, so it is redrawn only when the level actually
   // moved; the two panels below read the plan's dates, which can change without it.
   if (moved) renderIdentity();

@@ -780,7 +780,27 @@ function wireQuoteDetail() {
      handlers behind for anybody who signed in and out again. */
   const on = (id, event, fn) => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener(event, (e) => { if (quoAllowed()) fn(e); });
+    if (el) el.addEventListener(event, async (e) => {
+      const pro = typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro";
+      // Once the level is confirmed the handler runs synchronously, so its own
+      // preventDefault() still counts. Only while the answer is on its way does it wait,
+      // and then a submit is stopped first, or the browser would send the form natively.
+      let confirmedLevel = typeof lmConfirmedNow === "function" ? lmConfirmedNow() : null;
+      if (confirmedLevel === null) {
+        if (event === "submit") e.preventDefault();
+        try {
+          confirmedLevel = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+        } catch (err) {
+          quoRenderPro();
+          return;
+        }
+      }
+      if (confirmedLevel !== pro) {
+        quoRenderPro();
+        return;
+      }
+      if (quoAllowed()) fn(e);
+    });
   };
 
   // Chapter XXII's margin: one field on the page, because it is the number a tradesman
@@ -1127,13 +1147,25 @@ function buildQuotesPage() {
   const page = document.getElementById("quo-page");
   if (!page) return;
 
-  document.getElementById("quo-form").addEventListener("submit", (e) => {
+  document.getElementById("quo-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("quo-name");
     const project = document.getElementById("quo-project");
+    if (!name.value.trim()) return;
+    let confirmedLevel;
+    try {
+      confirmedLevel = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+    } catch (err) {
+      quoRenderPro();
+      return;
+    }
+    if (confirmedLevel !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+      quoRenderPro();
+      return;
+    }
     // The wall normally means this form is not on the screen. The check is here as well,
     // because a form that is only hidden still submits.
-    if (!name.value.trim() || !quoAllowed()) return;
+    if (!quoAllowed()) return;
     quoUndone = null; // a new quote is a new subject; the old undo is stale
     const quote = crmAddQuote({ name: name.value, projectId: project.value });
     if (quote) location.href = `${location.pathname}?id=${encodeURIComponent(quote.id)}`;
@@ -1142,10 +1174,21 @@ function buildQuotesPage() {
 
   // Owner, 2026-10-01: a quote could be deleted only from inside it. The list offers it per
   // row; the same undo strip as the editor's delete gives it back.
-  document.getElementById("quo-list").addEventListener("click", (e) => {
+  document.getElementById("quo-list").addEventListener("click", async (e) => {
     const button = e.target.closest("[data-quote-delete]");
     const row = e.target.closest("li[data-id]");
-    if (!button || !row || !quoAllowed()) return;
+    if (!button || !row) return;
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        quoRenderPro();
+        return;
+      }
+    } catch (err) {
+      quoRenderPro();
+      return;
+    }
+    if (!quoAllowed()) return;
     const q = crmQuote(row.dataset.id);
     if (!q) return;
     const token = crmDeleteQuote(q.id);
@@ -1153,18 +1196,40 @@ function buildQuotesPage() {
     quoRender();
   });
 
-  document.getElementById("quo-list").addEventListener("change", (e) => {
+  document.getElementById("quo-list").addEventListener("change", async (e) => {
     const select = e.target.closest("[data-quote-status]");
     const row = e.target.closest("li[data-id]");
-    if (!select || !row || !quoAllowed()) return;
+    if (!select || !row) return;
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        quoRenderPro();
+        return;
+      }
+    } catch (err) {
+      quoRenderPro();
+      return;
+    }
+    if (!quoAllowed()) return;
     const id = row.dataset.id;
     crmUpdateQuote(id, { status: select.value });
     const fresh = document.querySelector(`#quo-list li[data-id="${CSS.escape(id)}"] [data-quote-status]`);
     if (fresh) fresh.focus();
   });
 
-  document.getElementById("quo-undo-go").addEventListener("click", () => {
-    if (!quoUndone || !quoAllowed()) return;
+  document.getElementById("quo-undo-go").addEventListener("click", async () => {
+    if (!quoUndone) return;
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        quoRenderPro();
+        return;
+      }
+    } catch (err) {
+      quoRenderPro();
+      return;
+    }
+    if (!quoAllowed()) return;
     const back = crmRestoreQuote(quoUndone.token);
     quoUndone = back ? { token: quoUndone.token, name: back.name, restored: true } : null;
     quoRender();
@@ -1186,6 +1251,9 @@ function buildQuotesPage() {
      back up, which hides #quo-tool; the figures written into it while the account was Pro
      would still be inside it. quoRender() empties them — see quoClear(). */
   document.addEventListener("lm-session", quoRender);
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", quoRender);
+  }
   document.addEventListener("lm-account-ready", quoRender);
   // Back after opening a quote: the page never reloaded, so nothing else would notice.
   window.addEventListener("popstate", quoRender);

@@ -409,9 +409,23 @@ function crmBindPhoneField(input, error) {
 }
 
 function wireClientDetail() {
+  // Every action on one client's screen waits for the level the server confirms, as the
+  // quote screen does (assets/quotes-ui.js): a forged "pro" hint draws this screen for a
+  // second, and nothing on it may change the store in that second. Once the level is known
+  // the handler runs synchronously, so its own preventDefault() still counts.
   const on = (id, event, fn) => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener(event, fn);
+    if (!el) return;
+    el.addEventListener(event, async (e) => {
+      const pro = typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro";
+      let level = typeof lmConfirmedNow === "function" ? lmConfirmedNow() : null;
+      if (level === null) {
+        if (event === "submit") e.preventDefault();
+        level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      }
+      if (level !== pro) { crmRenderPro(); return; }
+      fn(e);
+    });
   };
 
   on("crm-client-edit", "click", () => {
@@ -421,8 +435,18 @@ function wireClientDetail() {
     if (crmEditing) document.getElementById("crm-edit-name").focus();
   });
 
-  on("crm-edit-form", "submit", (e) => {
+  on("crm-edit-form", "submit", async (e) => {
     e.preventDefault();
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        crmRenderPro();
+        return;
+      }
+    } catch (err) {
+      crmRenderPro();
+      return;
+    }
     const name = document.getElementById("crm-edit-name").value.trim();
     const phone = document.getElementById("crm-edit-phone");
     if (!name) return;
@@ -549,8 +573,18 @@ function buildClientsPage() {
   crmBindPhoneField(document.getElementById("crm-client-phone"), document.getElementById("crm-client-phone-error"));
   crmBindPhoneField(document.getElementById("crm-edit-phone"), document.getElementById("crm-edit-phone-error"));
 
-  document.getElementById("crm-client-form").addEventListener("submit", (e) => {
+  document.getElementById("crm-client-form").addEventListener("submit", async (e) => {
     e.preventDefault();
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        crmRenderPro();
+        return;
+      }
+    } catch (err) {
+      crmRenderPro();
+      return;
+    }
     const name = document.getElementById("crm-client-name");
     const phone = document.getElementById("crm-client-phone");
     const email = document.getElementById("crm-client-email");
@@ -582,16 +616,38 @@ function buildClientsPage() {
 
   // Both lists behave the same way, so one handler serves both. The name is a real link
   // and is left alone: letting it navigate is what makes Back and a copied address work.
-  const rowAction = (e) => {
+  const rowAction = async (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li) return;
-    if (e.target.closest("[data-unarchive]")) crmArchiveClient(li.dataset.id, false);
+    if (e.target.closest("[data-unarchive]")) {
+      try {
+        const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+        if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+          crmRenderPro();
+          return;
+        }
+      } catch (err) {
+        crmRenderPro();
+        return;
+      }
+      crmArchiveClient(li.dataset.id, false);
+    }
   };
   document.getElementById("crm-client-list").addEventListener("click", rowAction);
   document.getElementById("crm-archive-list").addEventListener("click", rowAction);
 
-  document.getElementById("crm-undo-go").addEventListener("click", () => {
+  document.getElementById("crm-undo-go").addEventListener("click", async () => {
     if (!crmUndone) return;
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        crmRenderPro();
+        return;
+      }
+    } catch (err) {
+      crmRenderPro();
+      return;
+    }
     const back = crmRestoreClient(crmUndone.token);
     crmUndone = back ? { token: crmUndone.token, name: back.name, restored: true } : null;
     crmRender();
@@ -608,6 +664,9 @@ function buildClientsPage() {
   // Signing in or out on /app/ moves the level; the preview switch moves the wall. Both
   // are wired here, once, by assets/paywall.js.
   pwMount("crm", "clients");
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", crmRender);
+  }
   // Back after opening a client: the page never reloaded, so nothing else would notice.
   window.addEventListener("popstate", crmRender);
 

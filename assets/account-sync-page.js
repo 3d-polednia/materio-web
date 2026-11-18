@@ -58,8 +58,35 @@ function showBlocked(on) {
 }
 
 async function start() {
+  if (typeof window !== "undefined" && window.__lmAccountSyncRunning) return;
+
   // The account hint is intentionally checked before any Firebase SDK import.
-  if (!FIREBASE_READY || typeof lmSignedIn !== "function" || !lmSignedIn()) return;
+  if (!FIREBASE_READY || typeof lmSignedIn !== "function") return;
+  if (!lmSignedIn()) {
+    // Signed out now, signed in later in another tab: start then, so this page confirms the
+    // level (and syncs) without a reload. Otherwise a Pro action here would wait for a
+    // confirmation nobody is going to send.
+    const later = (e) => {
+      if (e.key !== "liczmat-signed-in" || !lmSignedIn()) return;
+      window.removeEventListener("storage", later);
+      start().catch((err) => { if (typeof lmConfirmFail === "function") lmConfirmFail(err); });
+    };
+    window.addEventListener("storage", later);
+    return;
+  }
+  if (typeof window !== "undefined") window.__lmAccountSyncRunning = true;
+
+  const renderedLevel = typeof lmReadLevel === "function" ? lmReadLevel() : "guest";
+  let firstEmissionHandled = false;
+  const confirmTimer = setTimeout(() => {
+    if (!firstEmissionHandled) {
+      firstEmissionHandled = true;
+      if (typeof lmConfirmFail === "function") {
+        lmConfirmFail(Object.assign(new Error("timeout"), { code: "timeout" }));
+      }
+    }
+  }, CALL_LIMIT);
+
   const [{ initializeApp }, authMod, storeMod, { createAccountSync }] = await Promise.all([
     import(`${FIREBASE_SDK}/firebase-app.js`),
     import(`${FIREBASE_SDK}/firebase-auth.js`),
@@ -104,21 +131,63 @@ async function start() {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && activeUid) reconcile(activeUid).catch(() => {});
   });
-  authMod.onAuthStateChanged(auth, (user) => {
+  authMod.onAuthStateChanged(auth, async (user) => {
     activeUid = user && user.uid || "";
     sync.setUid(activeUid);
     delete window.lmAccount;
     showBlocked(!!activeUid && sync.blockedWorkspace());
-    if (!activeUid || sync.blockedWorkspace()) return;
+
+    if (!user) {
+      if (!firstEmissionHandled) {
+        firstEmissionHandled = true;
+        clearTimeout(confirmTimer);
+        const level = typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.GUEST : "guest";
+        if (typeof lmWriteLevel === "function" && lmReadLevel() !== level) lmWriteLevel(level);
+        if (level !== renderedLevel) {
+          window.dispatchEvent(new CustomEvent("lmlevelchange", { detail: { level } }));
+        }
+        if (typeof lmConfirmLevel === "function") lmConfirmLevel(level);
+      }
+      return;
+    }
+
     const uid = activeUid;
-    reconcile(uid).catch(() => {});
-    // The page API (today: the share link on the project view) waits for the plan the
-    // account really has, read from users/{uid} — never the copy hint, because a share
-    // stamps it (see shareProject() in assets/account-sync.js). It pushes first, so a
-    // project made on this page a moment ago exists in Firestore before it is published.
-    storeMod.getDoc(storeMod.doc(db, "users", uid)).then((snap) => {
-      if (activeUid !== uid || sync.blockedWorkspace()) return;
-      const level = lmLevelOf(user, snap.exists() ? snap.data() : {});
+    if (!sync.blockedWorkspace()) reconcile(uid).catch(() => {});
+    // The level is confirmed from users/{uid} even when the workspace in this browser is
+    // somebody else's copy: the plan belongs to the account, not to the workspace, and a
+    // confirmation that waited on the workspace could be skipped by planting a foreign
+    // `liczmat-sync-account`. The page API (today: the share link on the project view)
+    // waits for the same read — never the copy hint, because a share stamps it (see
+    // shareProject() in assets/account-sync.js). It pushes first, so a project made on
+    // this page a moment ago exists in Firestore before it is published.
+    let level;
+    try {
+      const snap = await inTime(storeMod.getDoc(storeMod.doc(db, "users", uid)));
+      if (activeUid !== uid) return;
+      level = typeof lmLevelOf === "function"
+        ? lmLevelOf(user, snap.exists() ? snap.data() : {})
+        : (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.LICZMAT : "liczmat");
+      if (!firstEmissionHandled) {
+        firstEmissionHandled = true;
+        clearTimeout(confirmTimer);
+      }
+      // Written only when it moves: lmWriteLevel() fires lm-session and every Pro screen
+      // redraws on it, which would take what somebody is typing out of a field.
+      if (typeof lmWriteLevel === "function" && lmReadLevel() !== level) lmWriteLevel(level);
+      if (level !== renderedLevel) {
+        window.dispatchEvent(new CustomEvent("lmlevelchange", { detail: { level } }));
+      }
+      if (typeof lmConfirmLevel === "function") lmConfirmLevel(level);
+    } catch (err) {
+      if (!firstEmissionHandled) {
+        firstEmissionHandled = true;
+        clearTimeout(confirmTimer);
+        if (typeof lmConfirmFail === "function") lmConfirmFail(err);
+      }
+      return;
+    }
+    if (activeUid !== uid || sync.blockedWorkspace()) return;
+    {
       window.lmAccount = {
         calendarFeed: (action) => inTime((async () => {
           const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
@@ -134,8 +203,10 @@ async function start() {
         uid,
       };
       document.dispatchEvent(new CustomEvent("lm-account-ready"));
-    }).catch(() => { /* no page API when the account's plan cannot be read */ });
+    }
   });
 }
 
-start().catch(() => {});
+start().catch((err) => {
+  if (typeof lmConfirmFail === "function") lmConfirmFail(err);
+});

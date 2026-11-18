@@ -97,13 +97,19 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   check("next page pushes edit left before debounce", true); await ctx.close();
 }
 {
-  const x = await open("/klienci/"); await waitSync(x.page); await x.page.fill("#crm-client-name", "Anna Test");
+  // The account has to really be Pro: since 2026-11-18 the page confirms the plan in
+  // users/{uid} and a "pro" hint alone puts the wall back up.
+  const x = await open("/klienci/", { docs: { "users/u1": { plan: "premium" } } }); await waitSync(x.page); await x.page.fill("#crm-client-name", "Anna Test");
   await x.page.fill("#crm-client-street", "Długa 7"); await x.page.fill("#crm-client-postal-code", "00-001");
+  // 00-001 has one place, so assets/postal.js fills the city by itself, asynchronously. Let it
+  // land before typing: an autofill arriving in the middle of fill() appended to the typed
+  // text ("WarszawaWarszawa").
+  await x.page.waitForFunction(() => document.getElementById("crm-client-city").value !== "", null, { timeout: 5000 });
   await x.page.fill("#crm-client-city", "Warszawa"); await x.page.click("#crm-client-form button[type=submit]");
   await x.page.waitForFunction(() => [...window.__fbDocs.keys()].some((k) => k.includes("/clients/")), null, { timeout: 4000 });
   const pushed = await doc(x.page, "users/u1/clients/");
   check("client is pushed", Boolean(pushed));
-  check("the split address is pushed", pushed[1].street === "Długa 7" && pushed[1].postalCode === "00-001" && pushed[1].city === "Warszawa");
+  check("the split address is pushed", pushed[1].street === "Długa 7" && pushed[1].postalCode === "00-001" && pushed[1].city === "Warszawa", JSON.stringify(pushed));
   check("and a new client keeps the legacy address empty", pushed[1].address === ""); await x.ctx.close();
 }
 {
@@ -144,8 +150,11 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   // Another tab signing out (or deleting the account) stops this page's pushes.
   const x = await open("/projekty/"); await waitSync(x.page);
   const other = await x.ctx.newPage();
-  // Any other page of the site will do; /kosztorys/ served until it became a redirect (2026-09-30).
-  await other.goto(base + "/klienci/", { waitUntil: "domcontentloaded" });
+  // Any page WITHOUT the account module will do (/kosztorys/ served until it became a redirect
+  // on 2026-09-30). Since 2026-11-18 an account page confirms the level with Firebase and
+  // writes the hint back, and here Firebase still says signed in: the hint alone is removed
+  // to play the sign-out, so a page that re-confirms would undo it under the test.
+  await other.goto(base + "/", { waitUntil: "domcontentloaded" });
   await other.evaluate(() => localStorage.removeItem("liczmat-signed-in"));
   await x.page.waitForTimeout(2500);
   const names = await x.page.evaluate(() => [...window.__fbDocs.values()].map((v) => v.name));

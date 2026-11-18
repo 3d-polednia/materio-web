@@ -130,8 +130,18 @@ function companyMount() {
       };
     }
   });
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        if (typeof pwRender === "function") pwRender("company", "company");
+        return;
+      }
+    } catch (err) {
+      if (typeof pwRender === "function") pwRender("company", "company");
+      return;
+    }
     if (!crmPhoneValid(phone.value)) {
       showPhoneError(true);
       phone.focus();
@@ -150,6 +160,16 @@ function companyMount() {
   document.getElementById("company-logo-file").addEventListener("change", async (event) => {
     error.hidden = true;
     try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        if (typeof pwRender === "function") pwRender("company", "company");
+        return;
+      }
+    } catch (err) {
+      if (typeof pwRender === "function") pwRender("company", "company");
+      return;
+    }
+    try {
       logo = await companyLogoFromFile(event.target.files[0]);
       showLogo();
     } catch (reason) {
@@ -167,6 +187,9 @@ function companyMount() {
   if (typeof pwMount === "function") {
     // Missing or unknown levels stay closed; paywall.js owns that conservative default.
     pwMount("company", "company");
+  }
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", draw);
   }
   updateTaxId();
   draw();

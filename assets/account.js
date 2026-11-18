@@ -6,7 +6,8 @@
  *
  * It ships on every page — it is two kilobytes and it is what lets a calculator page
  * word one sentence, or the header show a mark, without any of them loading Firebase.
- * /app/ is the only page that talks to Firebase Auth, and it is the only writer here.
+ * /app/ is where sign-in lives, and pages with a Pro gate confirm the real level via
+ * Firebase (assets/account-sync-page.js), updating it here.
  *
  * The level is derived, never asserted:
  *
@@ -16,8 +17,9 @@
  *
  * `plan` and `planValidUntil` are server-only fields (FIRESTORE_SYNC §2 and the rules in
  * config/firebase/firestore.rules: the client may write nothing but lastSeenAt and
- * appVersion). So a browser can read the level but can never grant itself one, and
- * nothing here is a permission check — see lmReadLevel().
+ * appVersion). So a browser can read the level but can never grant itself one.
+ * lmReadLevel() provides an optimistic first-paint hint, while Pro actions await
+ * server confirmation via lmConfirmedLevel().
  */
 
 var LM_LEVEL = { GUEST: "guest", LICZMAT: "liczmat", PRO: "pro" };
@@ -61,10 +63,11 @@ function lmLevelOf(user, profile, now) {
  * What this browser was last told about the session, for the pages that do not load
  * Firebase — that is 128 of the 130.
  *
- * **A hint, not authorization.** It can be stale: signed out in another tab, an expired
- * token, a second browser profile. Owner decision 2026-09-26: it switches account-only
- * tools and project-saving controls, while counting and public reading remain open.
- * Firebase is still the authority, and only /app/ asks it.
+ * **An optimistic first-paint hint, not authorization.** It can be stale: signed out in
+ * another tab, an expired token, a second browser profile. Owner decision 2026-09-26: it
+ * provides first-paint UI rendering so paying users see no locked flash, while pages
+ * with a Pro gate confirm the real level via Firebase and Pro actions wait for
+ * lmConfirmedLevel(). Firebase is still the authority.
  */
 function lmReadLevel() {
   var raw;
@@ -74,6 +77,93 @@ function lmReadLevel() {
   // is signed in, and /app/ will overwrite it with the real level on the next visit.
   if (raw === "1") return LM_LEVEL.LICZMAT;
   return LM_LEVEL_ORDER.indexOf(raw) > 0 ? raw : LM_LEVEL.GUEST;
+}
+
+var _lmConfirmedLevel = null;
+var _lmConfirmError = null;
+var _lmConfirmPromise = null;
+var _lmConfirmResolve = null;
+var _lmConfirmReject = null;
+
+/**
+ * Returns a Promise of the server-confirmed level for this page load.
+ * Resolves immediately once confirmation has happened on this page load.
+ * If the session hint is GUEST, resolves immediately with GUEST.
+ */
+function lmConfirmedLevel() {
+  if (_lmConfirmedLevel !== null) return Promise.resolve(_lmConfirmedLevel);
+  if (lmReadLevel() === LM_LEVEL.GUEST) {
+    _lmConfirmedLevel = LM_LEVEL.GUEST;
+    return Promise.resolve(LM_LEVEL.GUEST);
+  }
+  if (!_lmConfirmPromise) {
+    _lmConfirmPromise = new Promise(function (resolve, reject) {
+      _lmConfirmResolve = resolve;
+      _lmConfirmReject = reject;
+    });
+    // Whatever happens to the page's confirmation (the module never loaded, the visitor
+    // signed in from a page that had none), an action waits at most this long and then
+    // goes ahead on the hint, like any other unreachable server (lmConfirmFail()).
+    var fallback = setTimeout(function () {
+      if (_lmConfirmedLevel === null) lmConfirmFail();
+    }, 25000);
+    // In Node (the test sandboxes) a pending timer would hold the process open.
+    if (fallback && typeof fallback.unref === "function") fallback.unref();
+  }
+  return _lmConfirmPromise;
+}
+
+/**
+ * The confirmed level if this page load already has one, else null. For a listener that
+ * must stay synchronous when it can (a handler that calls preventDefault() itself), so it
+ * awaits lmConfirmedLevel() only while the answer is still on its way.
+ */
+function lmConfirmedNow() {
+  if (_lmConfirmedLevel !== null) return _lmConfirmedLevel;
+  return lmReadLevel() === LM_LEVEL.GUEST ? LM_LEVEL.GUEST : null;
+}
+
+/**
+ * Record the server-confirmed level from Firebase and resolve any waiting Pro action.
+ */
+function lmConfirmLevel(level) {
+  _lmConfirmedLevel = level;
+  _lmConfirmError = null;
+  if (_lmConfirmResolve) {
+    _lmConfirmResolve(level);
+    _lmConfirmResolve = null;
+    _lmConfirmReject = null;
+  }
+}
+
+/**
+ * Firebase could not be asked (no network, the SDK did not load, no answer within the call
+ * limit). The answer is then the hint, and a waiting Pro action goes ahead on it.
+ *
+ * Owner-facing trade-off, decided 2026-11-18: the Pro modules work from `localStorage` and
+ * a paying user with no connection must keep working, so an unreachable server cannot be
+ * a refusal. What this closes is the one-line console trick: whenever Firebase is
+ * reachable, it answers, and a forged hint is overwritten by the real level. Blocking the
+ * SDK on purpose still gets past it, which is the same class as editing this file in
+ * devtools: no browser check can stop that, only the server-side rules can.
+ */
+function lmConfirmFail(error) {
+  _lmConfirmError = error || Object.assign(new Error("timeout"), { code: "timeout" });
+  _lmConfirmedLevel = lmReadLevel();
+  if (_lmConfirmResolve) {
+    _lmConfirmResolve(_lmConfirmedLevel);
+    _lmConfirmResolve = null;
+    _lmConfirmReject = null;
+  }
+}
+
+/** Reset confirmation state (used by test harnesses). */
+function lmResetConfirm() {
+  _lmConfirmedLevel = null;
+  _lmConfirmError = null;
+  _lmConfirmPromise = null;
+  _lmConfirmResolve = null;
+  _lmConfirmReject = null;
 }
 
 /** Whether this browser believes somebody is signed in. Same caveat as lmReadLevel(). */

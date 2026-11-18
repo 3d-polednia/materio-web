@@ -286,12 +286,27 @@ function buildDashboard() {
   // Since 2026-09-04 the identity chip is not the only thing this reads the hint for —
   // dashCanCost() does too, so a level that moved has to redraw the money along with it.
   document.addEventListener("lm-session", dashRender);
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", dashRender);
+  }
   // Saved lines keep the currency they were priced in; the totals still have to be
   // relabelled when the visitor switches, exactly as /projekty/ and /kosztorys/ do.
   document.addEventListener("currencychange", dashRender);
   // The page swaps text in place instead of navigating, so everything JavaScript wrote
   // has to be written again in the new language — including the dates and the links.
   document.addEventListener("langchange", dashRender);
+
+  // This page loads no Firebase for speed, so a hint that claims Pro (the one thing that
+  // shows prices here) is confirmed after the first draw: the same module the account
+  // pages load, at the same cache stamp as this script, so the browser fetches one copy.
+  // Not on /app/, which loads this file too: assets/app.js runs its own sync and confirms
+  // the level itself (applyProfile()), and a second engine would push everything twice.
+  const onApp = typeof document !== "undefined" && document.querySelector('script[src*="/assets/app."]');
+  if (!onApp && typeof lmReadLevel === "function" && lmReadLevel() === "pro" && typeof window !== "undefined" && !window.__lmAccountSyncRunning) {
+    const own = typeof document !== "undefined" && document.querySelector('script[src*="/assets/dashboard"]');
+    const stamp = own && own.getAttribute("src").split("?")[1];
+    import("/assets/account-sync-page.min.js" + (stamp ? "?" + stamp : "")).catch(() => {});
+  }
 
   dashRender();
 }

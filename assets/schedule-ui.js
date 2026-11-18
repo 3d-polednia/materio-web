@@ -190,9 +190,19 @@ function buildSchedulePage() {
 
   // The one write this module makes, and it is the job's own: a date typed here is the
   // same field /zlecenia/ writes, validated by the same crmDay().
-  page.addEventListener("change", (e) => {
+  page.addEventListener("change", async (e) => {
     const input = e.target.closest(".cal-due");
     if (!input) return;
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        calRenderPro();
+        return;
+      }
+    } catch (err) {
+      calRenderPro();
+      return;
+    }
     const row = input.closest("li[data-id]");
     if (!row) return;
     // A term's day is the term's own field; a project's is its deadline.
@@ -215,6 +225,9 @@ function buildSchedulePage() {
   // Signing in or out on /app/ moves the level; the preview switch moves the wall. Both
   // are wired here, once, by assets/paywall.js.
   pwMount("cal", "calendar");
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", calRender);
+  }
 
   if (typeof sgMount === "function") {
     sgMount({ prefix: "cal", projectUrl: (id) => `${calUrl("projects", "/projekty/")}?id=${encodeURIComponent(id)}` });

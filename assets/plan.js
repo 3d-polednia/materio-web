@@ -309,10 +309,10 @@ function lmFeaturesAt(level) {
 /**
  * May a visitor at `level` use this feature?
  *
- * `level` is passed in rather than read here on purpose: the only thing a page can read
- * without Firebase is `liczmat-signed-in`, which is a copy hint and may be stale, and a
- * function that quietly gated on it would eventually hide somebody's own projects from
- * them. A caller that wants the hint asks for it (lmReadLevel()) and owns that choice.
+ * `level` is passed in rather than read here on purpose: the initial value from
+ * `lmReadLevel()` is an optimistic hint on first paint; on pages with a Pro gate, Firebase confirms
+ * the real level and Pro actions await `lmConfirmedLevel()`. A function that quietly gated
+ * without confirmation would risk acting on a forged or stale hint. A caller passes `level` explicitly.
  *
  * An unknown feature id answers false. A typo should close a door, not open one.
  */

@@ -393,8 +393,8 @@ export function page(p) {
     // What this browser was last told about the session (assets/account.js writes the
     // key). It is read here, before the first paint, because a navigation link hangs off
     // it: doing it in account.js, which loads at the end of the document, would show the
-    // link and then take it away. Still a hint and still never a gate: it decides which
-    // links are offered, and nothing may gate saving, counting or reading on it.
+    // link and then take it away. An optimistic first-paint hint: it decides which
+    // links are offered, while pages with a Pro gate confirm the real level via Firebase.
     var s = localStorage.getItem('liczmat-signed-in');
     if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}

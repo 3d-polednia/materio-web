@@ -858,10 +858,15 @@ head("8b. a guest and a free account get no quote drawn, not a quote hidden");
      lives in every handler here instead, and it is checked when the event arrives rather
      than when the listener is bound: an account can stop being Pro while the page is open. */
   const src = read("assets/quotes-ui.js");
+  // Since 2026-11-18 each of them also waits for the level Firebase confirms
+  // (lmConfirmedLevel() in assets/account.js) before the question below is asked, so a
+  // forged "pro" hint cannot write in the second before the wall comes back.
   check("every listener on the detail goes through one guard",
-    src.includes("el.addEventListener(event, (e) => { if (quoAllowed()) fn(e); })"));
-  check("the add form asks before it writes", /!name\.value\.trim\(\) \|\| !quoAllowed\(\)\) return;/.test(src));
-  check("so does the undo", /!quoUndone \|\| !quoAllowed\(\)\) return;/.test(src));
+    /addEventListener\(event, async \(e\) => \{[\s\S]{0,900}?lmConfirmedLevel\(\)[\s\S]{0,400}?if \(quoAllowed\(\)\) fn\(e\);/.test(src));
+  check("the add form asks before it writes",
+    /if \(!name\.value\.trim\(\)\) return;[\s\S]{0,700}?lmConfirmedLevel\(\)[\s\S]{0,600}?if \(!quoAllowed\(\)\) return;\s*[\r\n]+\s*quoUndone = null;/.test(src));
+  check("so does the undo",
+    /if \(!quoUndone\) return;[\s\S]{0,500}?lmConfirmedLevel\(\)[\s\S]{0,400}?if \(!quoAllowed\(\)\) return;\s*[\r\n]+\s*const back = crmRestoreQuote/.test(src));
   check("and the cancel button, which is the one listener outside the helper",
     /if \(!quoAllowed\(\)\) return;\s*[\r\n]+\s*quoEditing = false;/.test(src));
   check("nothing here calls a write before the question",

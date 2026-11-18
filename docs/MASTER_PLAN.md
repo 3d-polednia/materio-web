@@ -474,6 +474,18 @@ otwarta.
 
 ### Bramka po stronie serwera — otwarte od 2026-09-04, bez przypisanej sesji
 
+> **2026-11-18: wariant 1 zrobiony, na wszystkich stronach z bramką.** Każda strona, która
+> stawia ścianę Pro, ładuje `assets/account-sync-page.js`; ten po pierwszej odpowiedzi
+> Firebase Auth czyta `users/{uid}`, liczy poziom `lmLevelOf()`, poprawia podpowiedź
+> i wysyła `lmlevelchange`, na które ściany i ekrany się przerysowują. Akcje Pro (PDF,
+> wyceny, klienci, koszty, terminarz, Moja firma) czekają na `lmConfirmedLevel()`.
+> `/app/dashboard/` dociąga ten sam moduł, gdy podpowiedź mówi „pro”. Wpis
+> `liczmat-signed-in = "pro"` w konsoli już niczego nie otwiera, gdy Firebase odpowiada.
+> Świadomy kompromis właściciela: bez połączenia (Firebase nieosiągalny) akcja idzie według
+> podpowiedzi, żeby płacący bez internetu dalej pracował; zablokowanie SDK w devtools albo
+> podmiana funkcji w konsoli dalej to obchodzą, bo żadna kontrola w przeglądarce tego nie
+> zatrzyma. Opis poniżej zostaje jako historia.
+
 **Brama przed cenami na `/projekty/`, `/kosztorys/` i `/app/dashboard/` czyta wyłącznie
 podpowiedź `liczmat-signed-in`.** `lmReadLevel()` w `assets/account.js` mówi to sam o
 sobie od zawsze: „a hint, never a gate" — i to zdanie było prawdziwe, dopóki podpowiedź

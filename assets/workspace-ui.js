@@ -1072,6 +1072,12 @@ function buildProjectsPage() {
     wsGateMoneyFields();
     wsRenderWorkspace();
   });
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", () => {
+      wsGateMoneyFields();
+      wsRenderWorkspace();
+    });
+  }
 
   document.getElementById("ws-project-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -1392,7 +1398,7 @@ function wireProjectDetail() {
 
   // Chapter XVI's four writes plus chapter XVII's price, in one submit: the quantity, the
   // name, the unit, the note and what one unit costs.
-  on("ws-project-materials", "submit", (e) => {
+  on("ws-project-materials", "submit", async (e) => {
     const form = e.target.closest("[data-mat-edit]");
     if (!form) return;
     e.preventDefault();
@@ -1415,7 +1421,19 @@ function wireProjectDetail() {
        missing field read as a zero would erase the price of every row a Pro account had
        already put one on, the moment that account went back to free. Not passing the key
        at all is what wsUpdateItem() reads as "unchanged". */
-    if (wsCanCost()) {
+    let canCost = wsCanCost();
+    if (canCost) {
+      try {
+        const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+        if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+          canCost = false;
+          if (typeof pwRender === "function") pwRender("cost", "costs");
+        }
+      } catch (err) {
+        canCost = false;
+      }
+    }
+    if (canCost) {
       // The quantity above is applied first, so the cost is this price times the quantity
       // the visitor is looking at — chapter XVII's "7 × 35 PLN = 245 PLN".
       fields.priceMajor = wsDecimal(get("priceMajor"));
@@ -1500,11 +1518,23 @@ function wireProjectDetail() {
 
   // Chapter XVI's "dodać własny materiał", now with chapter XVII's price on it.
   on("ws-mat-form", "input", (e) => wsMatSum(e.currentTarget));
-  on("ws-mat-form", "submit", (e) => {
+  on("ws-mat-form", "submit", async (e) => {
     e.preventDefault();
     const el = (id) => document.getElementById(id);
     const name = el("ws-mat-name").value.trim();
     if (!name || !wsOpenId) return;
+    let canCost = wsCanCost();
+    if (canCost && el("ws-mat-price").value) {
+      try {
+        const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+        if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+          canCost = false;
+          if (typeof pwRender === "function") pwRender("cost", "costs");
+        }
+      } catch (err) {
+        canCost = false;
+      }
+    }
     const made = wsAddOwnItem({
       projectId: wsOpenId,
       name,
@@ -1515,7 +1545,7 @@ function wireProjectDetail() {
       // A hand-typed material is `shopping` and free; the price on it is `costs` and is
       // not. A level that does not reach the price gets a row with none rather than a
       // refusal to add the material at all.
-      priceMajor: wsCanCost() ? wsDecimal(el("ws-mat-price").value) : 0,
+      priceMajor: canCost ? wsDecimal(el("ws-mat-price").value) : 0,
     });
     if (!made) return;
     // The name, the note and the price are about one material and go; the quantity, the
@@ -1534,7 +1564,7 @@ function wireProjectDetail() {
     if (li && e.target.closest("[data-del]")) wsDeleteEstimation(li.dataset.id);
   });
 
-  on("ws-other-form", "submit", (e) => {
+  on("ws-other-form", "submit", async (e) => {
     e.preventDefault();
     const el = (id) => document.getElementById(id);
     const name = el("ws-other-name").value.trim();
@@ -1542,6 +1572,16 @@ function wireProjectDetail() {
     // The section is behind the wall; this is the second guard, for the form reached
     // some other way.
     if (!name || !wsOpenId || !wsCanCost()) return;
+    try {
+      const level = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+      if (level !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+        if (typeof pwRender === "function") pwRender("cost", "costs");
+        return;
+      }
+    } catch (err) {
+      if (typeof pwRender === "function") pwRender("cost", "costs");
+      return;
+    }
     wsAddManualEstimation({
       projectId: wsOpenId,
       name,

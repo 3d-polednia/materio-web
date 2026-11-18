@@ -720,6 +720,9 @@ function pdfInit() {
      while the account was Pro is still in the page, so the redraw that puts the wall back
      up empties it as well. */
   document.addEventListener("lm-session", () => { if (!pdfAllowed()) pdfClear(); });
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", () => { if (!pdfAllowed()) pdfClear(); });
+  }
 
   const form = document.getElementById("ws-pdf-form");
   const doc = document.getElementById("ws-pdf-doc");
@@ -743,6 +746,19 @@ function pdfInit() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    let confirmedLevel;
+    try {
+      confirmedLevel = typeof lmConfirmedLevel === "function" ? await lmConfirmedLevel() : null;
+    } catch (err) {
+      const status = form.querySelector(".quo-pdf-download-status");
+      if (status) status.textContent = typeof t === "function" ? t("err_timeout") : "err_timeout";
+      if (typeof pwRender === "function") pwRender("pdf", "pdf");
+      return;
+    }
+    if (confirmedLevel !== (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro")) {
+      if (typeof pwRender === "function") pwRender("pdf", "pdf");
+      return;
+    }
     // Asked before the document is built and again before the dialog is opened. The wall
     // normally means this listener is never reached at all; this is the case where the
     // markup was reached anyway.

@@ -688,6 +688,195 @@ head("10. nothing on the page grants a plan");
   check("nor planValidUntil", !/\bplanValidUntil\s*:/.test(app));
 }
 
+/* ------------------------------------------------------------------ 11. confirmation of the Pro level and action gating */
+
+head("11. confirmation of the Pro level and action gating");
+
+function loadGateSandbox(initialLevel) {
+  const store = new Map();
+  if (initialLevel && initialLevel !== "guest") {
+    store.set("liczmat-signed-in", initialLevel);
+  }
+  const localStorage = {
+    getItem: (k) => (store.has(k) ? store.get(k) : null),
+    setItem: (k, v) => store.set(k, String(v)),
+    removeItem: (k) => store.delete(k),
+  };
+  const events = [];
+  const windowListeners = {};
+  const window = {
+    localStorage,
+    addEventListener: (type, fn) => { (windowListeners[type] = windowListeners[type] || []).push(fn); },
+    removeEventListener: (type, fn) => {
+      if (windowListeners[type]) windowListeners[type] = windowListeners[type].filter((f) => f !== fn);
+    },
+    dispatchEvent: (e) => {
+      events.push(e);
+      (windowListeners[e.type] || []).forEach((fn) => fn(e));
+    },
+  };
+  const document = {
+    cookie: "",
+    documentElement: {
+      setAttribute: () => {},
+      removeAttribute: () => {},
+    },
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    getElementById: () => null,
+    addEventListener: () => {},
+    dispatchEvent: (e) => events.push(e),
+  };
+  class CustomEvent {
+    constructor(type, init) {
+      this.type = type;
+      this.detail = init && init.detail;
+    }
+  }
+
+  const src = ["assets/account.js", "assets/plan.js", "assets/paywall.js"]
+    .map((f) => readFileSync(p(f), "utf8")).join("\n");
+
+  const api = new Function(
+    "window", "document", "localStorage", "CustomEvent", "location",
+    `${src}
+    return {
+      LM_LEVEL, LM_PLAN, LM_FEATURES,
+      lmReadLevel, lmWriteLevel, lmLevelOf,
+      lmConfirmedLevel, lmConfirmLevel, lmConfirmFail, lmResetConfirm,
+      pwLevel, pwState, pwAllows,
+    };`
+  )(window, document, localStorage, CustomEvent, { protocol: "https:" });
+
+  return { ...api, store, events, window, document };
+}
+
+{
+  // a) hint "pro", no Firebase user -> confirmed GUEST, hint cleared, pwAllows("quotes") false after confirm
+  {
+    const sb = loadGateSandbox("pro");
+    check("a) initial hint pro allows quotes optimistically", sb.pwAllows("quotes") === true);
+    check("a) initial hint is in storage", sb.store.get("liczmat-signed-in") === "pro");
+
+    const confirmed = sb.lmLevelOf(null, null);
+    eq("a) no Firebase user computes to GUEST", confirmed, sb.LM_LEVEL.GUEST);
+
+    sb.lmWriteLevel(confirmed);
+    sb.lmConfirmLevel(confirmed);
+
+    const level = await sb.lmConfirmedLevel();
+    eq("a) confirmed level is GUEST", level, sb.LM_LEVEL.GUEST);
+    check("a) hint cleared from storage", sb.store.get("liczmat-signed-in") === undefined || sb.store.get("liczmat-signed-in") === null);
+    eq("a) pwAllows('quotes') is false after confirm", sb.pwAllows("quotes"), false);
+  }
+
+  // b) hint "pro", user with profile {plan:"free"} -> LICZMAT, Pro actions refused
+  {
+    const sb = loadGateSandbox("pro");
+    const user = { uid: "u1" };
+    const profile = { plan: "free" };
+    const confirmed = sb.lmLevelOf(user, profile);
+    eq("b) profile with free plan computes to LICZMAT", confirmed, sb.LM_LEVEL.LICZMAT);
+
+    sb.lmWriteLevel(confirmed);
+    sb.lmConfirmLevel(confirmed);
+
+    const level = await sb.lmConfirmedLevel();
+    eq("b) confirmed level is LICZMAT", level, sb.LM_LEVEL.LICZMAT);
+
+    let actionAllowed = false;
+    try {
+      const cur = await sb.lmConfirmedLevel();
+      if (cur === sb.LM_LEVEL.PRO) actionAllowed = true;
+    } catch (e) {
+      actionAllowed = false;
+    }
+    check("b) Pro action refused for confirmed LICZMAT", actionAllowed === false);
+    eq("b) pwAllows('quotes') is false after confirm", sb.pwAllows("quotes"), false);
+  }
+
+  // c) hint "liczmat", profile {plan:"premium"} valid -> PRO after confirm (stale-free hint unlocks)
+  {
+    const sb = loadGateSandbox("liczmat");
+    eq("c) initial hint liczmat does not allow quotes", sb.pwAllows("quotes"), false);
+
+    const user = { uid: "u2" };
+    const future = Date.now() + 30 * 86400000;
+    const profile = { plan: "premium", planValidUntil: future };
+    const confirmed = sb.lmLevelOf(user, profile);
+    eq("c) profile with valid premium computes to PRO", confirmed, sb.LM_LEVEL.PRO);
+
+    sb.lmWriteLevel(confirmed);
+    sb.lmConfirmLevel(confirmed);
+
+    const level = await sb.lmConfirmedLevel();
+    eq("c) confirmed level is PRO", level, sb.LM_LEVEL.PRO);
+    eq("c) storage updated to pro", sb.store.get("liczmat-signed-in"), "pro");
+    check("c) pwAllows('quotes') is true after confirm (stale-free hint unlocks)", sb.pwAllows("quotes") === true);
+
+    let actionAllowed = false;
+    const cur = await sb.lmConfirmedLevel();
+    if (cur === sb.LM_LEVEL.PRO) actionAllowed = true;
+    check("c) Pro action allowed for confirmed PRO", actionAllowed === true);
+  }
+
+  // d) profile {plan:"premium", planValidUntil: past} -> LICZMAT
+  {
+    const sb = loadGateSandbox("pro");
+    const user = { uid: "u3" };
+    const past = Date.now() - 60000;
+    const profile = { plan: "premium", planValidUntil: past };
+    const confirmed = sb.lmLevelOf(user, profile);
+    eq("d) expired premium computes to LICZMAT", confirmed, sb.LM_LEVEL.LICZMAT);
+
+    sb.lmWriteLevel(confirmed);
+    sb.lmConfirmLevel(confirmed);
+
+    const level = await sb.lmConfirmedLevel();
+    eq("d) confirmed level is LICZMAT", level, sb.LM_LEVEL.LICZMAT);
+    check("d) pwAllows('quotes') is false after expired plan", sb.pwAllows("quotes") === false);
+  }
+
+  // e) Firebase unreachable (timeout, no network, SDK blocked) -> the action follows the
+  //    hint, so a paying user offline keeps working (owner trade-off 2026-11-18, see
+  //    lmConfirmFail() in assets/account.js); display and storage stay as they were.
+  {
+    const sb = loadGateSandbox("pro");
+    check("e) initial display/hint is pro", sb.store.get("liczmat-signed-in") === "pro");
+    check("e) initial pwAllows is true", sb.pwAllows("quotes") === true);
+
+    const pending = sb.lmConfirmedLevel();
+    sb.lmConfirmFail(Object.assign(new Error("timeout"), { code: "timeout" }));
+    eq("e) a waiting action resolves with the hint after a timeout", await pending, sb.LM_LEVEL.PRO);
+    eq("e) a later action gets the same answer", await sb.lmConfirmedLevel(), sb.LM_LEVEL.PRO);
+    eq("e) display/storage unchanged (keeps hint 'pro')", sb.store.get("liczmat-signed-in"), "pro");
+    eq("e) pwAllows stays true", sb.pwAllows("quotes"), true);
+  }
+  {
+    const sb = loadGateSandbox("liczmat");
+    sb.lmConfirmFail(Object.assign(new Error("offline"), { code: "unavailable" }));
+    eq("e) unreachable server never raises a free hint to Pro", await sb.lmConfirmedLevel(), sb.LM_LEVEL.LICZMAT);
+  }
+
+  // f) hint guest/liczmat on a gated page -> no Firebase import attempted
+  {
+    const sbGuest = loadGateSandbox("guest");
+    const guestLevel = await sbGuest.lmConfirmedLevel();
+    eq("f) guest resolves immediately to guest", guestLevel, sbGuest.LM_LEVEL.GUEST);
+
+    const paywallSrc = readFileSync(p("assets/paywall.js"), "utf8");
+    const dashSrc = readFileSync(p("assets/dashboard.js"), "utf8");
+    const syncSrc = readFileSync(p("assets/account-sync-page.js"), "utf8");
+
+    check("f) paywall only dynamically imports sync when hint is pro",
+      paywallSrc.includes("account-sync-page.js") && paywallSrc.includes("LM_LEVEL.PRO"));
+    check("f) dashboard only dynamically imports sync when hint is pro",
+      dashSrc.includes('lmReadLevel() === "pro"'));
+    check("f) account-sync-page guards against running when not signed in",
+      syncSrc.includes('!lmSignedIn()'));
+  }
+}
+
 /* ------------------------------------------------------------------ report */
 
 console.log(`\nplan: ${passed}/${passed + failures.length} checks pass`);

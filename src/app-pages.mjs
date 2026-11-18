@@ -561,7 +561,7 @@ const QUICK_ACTIONS = [
  * the first screen after signing in, and making it wait for an SDK download and an auth
  * round-trip before it can list somebody's own local projects would be slower than the
  * calculator it came from. The level shown in the strip is the copy hint from
- * assets/account.js, which is a hint and never a gate: a guest sees their own data and a
+ * assets/account.js: an optimistic first-paint hint confirmed by Firebase when claiming Pro: a guest sees their own data and a
  * card explaining what an account adds, not a locked door.
  *
  * The lists are drawn by assets/dashboard.js. What the build renders is the frame — the

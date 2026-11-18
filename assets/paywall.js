@@ -31,10 +31,12 @@ const pwT = (key) => (typeof t === "function" ? t(key) : key);
 /**
  * What this browser was last told about the session.
  *
- * `liczmat-signed-in` is a copy hint and can be stale (assets/account.js says so). It
- * still decides what the paywall shows, and that is the intended weight of it: the CRM
+ * `liczmat-signed-in` is an optimistic first-paint hint (assets/account.js says so). It
+ * still decides what the paywall shows on first paint, and that is the intended weight of it: the CRM
  * rows are `localStorage` on this device, in no sync contract, so the wall is a product
- * decision rather than a boundary. The boundary is the deployed Firestore rules, and they
+ * decision rather than a boundary. On gated pages, Firebase confirms the real level
+ * and dispatches `lmlevelchange`, while Pro actions await `lmConfirmedLevel()`.
+ * The boundary is the deployed Firestore rules, and they
  * are not asked here because nothing here writes to Firestore.
  */
 const pwGuest = () => (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.GUEST : "guest");
@@ -181,6 +183,11 @@ function pwMount(prefix, feature) {
   document.addEventListener("lm-session", () => pwRender(prefix, feature));
   document.addEventListener("currencychange", () => pwRender(prefix, feature));
   document.addEventListener("langchange", () => pwRender(prefix, feature));
+  // The confirmation itself comes from assets/account-sync-page.js, which every page that
+  // mounts a wall loads as a module (scripts/build.mjs, `modules`); this only redraws.
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", () => pwRender(prefix, feature));
+  }
   pwRender(prefix, feature);
 }
 
@@ -250,5 +257,8 @@ if (typeof document !== "undefined" && document.getElementById("pro-pay")) {
   document.addEventListener("lm-session", pwPage);
   document.addEventListener("currencychange", pwPage);
   document.addEventListener("langchange", pwPage);
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("lmlevelchange", pwPage);
+  }
   pwPage();
 }

@@ -1746,7 +1746,11 @@ Kotlin side of it. Change one, change all three.
   stylesheet hides the item only when the level is known. **No script means no `.js` class
   means the link stays** — so Googlebot sees it, `/projekty/` keeps `indexable: true` and
   stays in `sitemap.xml`, and the page itself is not gated and cannot be.
-- **`liczmat-signed-in` is a copy hint, never a gate.** `/app/` writes the level into it
+- **`liczmat-signed-in` is a copy hint, and since 2026-11-18 a Pro gate confirms it.** Every page
+  that mounts a Pro wall loads `assets/account-sync-page.js`, which reads `users/{uid}` after the
+  first Firebase Auth answer, rewrites the hint with `lmLevelOf()` and fires `lmlevelchange`; Pro
+  actions await `lmConfirmedLevel()` (assets/account.js). Unreachable Firebase falls back to the
+  hint on purpose (offline Pro users keep working). Below is the older half of the story. `/app/` writes the level into it
   on sign-in and clears it on sign-out, because the 60 calculator pages do not load
   Firebase and still have to choose between "create a free account" and "your account
   will sync this" under the result (master plan XII); it is also the mark on the header's
