@@ -267,9 +267,9 @@ head("1c. quotes live beside the clients and the jobs, and the workspace is unto
 
   eq("the Pro store is its own key", crm.keys().includes(crm.CRM_KEY), true);
   eq("which is not the workspace's", crm.CRM_KEY === "materio-workspace-v1", false);
-  eq("the Pro store holds exactly the three local collections",
-    // Since 2026-09-30 the Pro store has four local collections.
-    Object.keys(crm.raw()).sort().join(), "clients,companies,jobs,quotes");
+  eq("the Pro store holds exactly the migration-safe local collections",
+    // `events` since 2026-10-06: the terminarz's own terms (owner), not a history log.
+    Object.keys(crm.raw()).sort().join(), "clients,companies,events,jobs,quotes");
 
   const exported = crm.wsExport();
   eq("wsExport() carries no quotes", exported.quotes, undefined);
@@ -750,8 +750,9 @@ head("8. the route, and chapter XXV's gate");
   eq("quotes is live", r.status, STATUS.LIVE);
   eq("at the Pro level", r.level, LEVEL.PRO);
   eq("under the projects, where chapter XXIV puts it since a job became one", r.parent, "projects");
-  eq("indexable — chapter XXVI wants Pro described in public", r.indexable, true);
-  eq("its link is offered to Pro only", r.navLevel, LEVEL.PRO);
+  check("the 2026-09-26 account sidebar owns the link", !r.navLevel);
+  check("it is no longer duplicated in the footer", !r.footer);
+  eq("and noindex; the public Pro description is /liczmat-pro/", r.indexable, false);
 
   const view = route("quote");
   eq("one quote is a view of the same page", view.view, true);
@@ -872,14 +873,13 @@ head("8b. a guest and a free account get no quote drawn, not a quote hidden");
   check("nothing here calls a write before the question",
     src.indexOf("const quoAllowed") < src.indexOf("crmAddQuote("));
 
-  // /app/'s own Wyceny panel is the second place a quote can be made, and it asks the
-  // level Firebase gave it rather than the copy hint in storage.
+  // Since 2026-09-26 (commit 4df1726c2) the duplicate shortened tools left /app/:
+  // quotes are made exclusively on the full /wyceny/ page, which guards them above,
+  // and /app/ links there via the account sidebar.
   const app = read("assets/app.js");
-  check("/app/ asks the plan on the account", app.includes('lmCan("quotes", state.level)'));
-  check("and draws nothing for a level that may not have it",
-    app.includes("if (!canQuotes()) { list.innerHTML = \"\"; return; }"));
-  check("its add form asks too", app.includes("!canQuotes()) return;"));
-  check("and its delete button", app.includes("|| !canQuotes()) return;"));
+  check("/app/ no longer carries duplicate quote creation code", !app.includes("canQuotes"));
+  const sidebar = read("src/account-sidebar.mjs");
+  check("account sidebar links to quotes", sidebar.includes("urlQuotes"));
 
   /* And the page redraws itself for the level it has just become. pwMount() puts the wall
      back up; without this the figures written while the account was Pro would still be
@@ -1063,8 +1063,9 @@ head("9b. the copy, in four languages");
     check(`${lang}: the five figures are five different words`, new Set(figs).size === 5, figs.join(" | "));
   }
   const account = read("assets/app.js");
+  const sync = read("assets/account-sync.js");
   check("the account visit is where local rows are reconciled",
-    account.includes("async function autoReconcile(uid)") && account.includes("autoReconcile(uid);"));
+    sync.includes("async function autoReconcile(uid)") && account.includes("autoReconcile(uid)"));
   // Chapter XXII's own vocabulary, in the language the plan is written in.
   eq("the page is called Wyceny in Polish", DICT.pl.quopage_title, "Wyceny");
   eq("materiały", DICT.pl.quo_fig_materials, "Materiał");

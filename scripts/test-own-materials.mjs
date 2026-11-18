@@ -38,6 +38,7 @@ import { ownMaterialsMain } from "../src/pages.mjs";
 import { OMAT_COPY, OMAT_COPY_KEYS } from "../src/omat-copy.mjs";
 import { LANGS, SECTION, urlOwnMaterials } from "../src/site.mjs";
 import { LEVEL, STATUS, route } from "../src/ia.mjs";
+import { esc } from "../src/template.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -470,27 +471,29 @@ head("7. export, import and last-write-wins");
 
 head("7b. /app/ pushes and pulls this collection");
 {
-  const app = read("assets/app.js");
-  check("the push writes users/{uid}/materials", /proDoc\("materials",/.test(app));
-  check("the pull reads it", /"clients", "jobs", "quotes", "materials"/.test(app));
-  check("the pull merges it into this store", app.includes("omImport(incoming)"));
+  const sync = read("assets/account-sync.js");
+  check("the push writes users/{uid}/materials", /proDoc\("materials",/.test(sync));
+  check("the pull reads it", /"clients", "jobs", "quotes", "materials"/.test(sync));
+  check("the pull merges it into this store", sync.includes("omImport(incoming)"));
   /* Written without the argument list until session G, so the day `since` was threaded
      through for incremental pushes both halves stopped matching and the check went red
      while the property it names never moved. */
   check("the push is called beside the Pro one",
-    /await pushProWorkspace\([^)]*\);[\s\S]{0,400}?await pushOwnMaterials\([^)]*\);/.test(app));
+    /await pushProWorkspace\([^)]*\);[\s\S]{0,400}?await pushOwnMaterials\([^)]*\);/.test(sync));
   /* And not from inside it: pushProWorkspace() returns early when the Pro store is not on
      the page, and these two stores are independent — nesting them would make the visitor's
      own materials stop syncing for everybody without a CRM. */
-  const proBody = app.slice(app.indexOf("async function pushProWorkspace("));
+  const proStart = sync.indexOf("async function pushProWorkspace(");
+  const ownStart = sync.indexOf("async function pushOwnMaterials(");
+  const proBody = sync.slice(proStart, ownStart);
   check("and not from inside it",
-    !proBody.slice(0, proBody.indexOf("\n}")).includes("pushOwnMaterials("));
+    !proBody.includes("pushOwnMaterials("));
   // The rules are the last gate and a document they refuse fails the whole pass, so the
   // push clamps every field rather than sending what the store happens to hold.
-  check("the pushed history is capped at the rules' sixty", /\.slice\(0, 60\)/.test(app));
+  check("the pushed history is capped at the rules' sixty", /\.slice\(0, 60\)/.test(sync));
   check("and the store is on the page that pushes it",
     read("scripts/build.mjs").includes('"/assets/own-materials.js"'));
-  check("the device wipe names the key", app.includes('"liczmat-materials-v1"'));
+  check("the device wipe names the key", sync.includes('"liczmat-materials-v1"'));
 }
 
 /* ================================================================== 8. the route */
@@ -500,12 +503,10 @@ head("8. the route and the thirteen slugs");
   const r = route("own-materials");
   check("the route exists", Boolean(r));
   eq("it is LIVE", r.status, STATUS.LIVE);
-  eq("GUEST, like /projekty/ and for the same reason", r.level, LEVEL.GUEST);
-  eq("the link is offered to an account", r.navLevel, LEVEL.LICZMAT);
-  check("indexable", r.indexable === true);
+  eq("it belongs to a free account", r.level, LEVEL.LICZMAT);
+  check("the 2026-09-26 account sidebar owns the link", !r.navLevel && !r.header && !r.footer);
+  eq("and noindex; the public Pro description is /liczmat-pro/", r.indexable, false);
   eq("parented under the catalogue", r.parent, "materials");
-  check("and it is in the footer, not the header",
-    Boolean(r.footer) && !r.header);
 
   const slugs = LANGS.map((l) => SECTION.ownMaterials[l]);
   eq("thirteen slugs", slugs.filter(Boolean).length, LANGS.length);
@@ -552,8 +553,9 @@ head("9. the frame the build writes, in ten languages");
     check(`${lang}: the six applications are named`,
       ["WALL_FLOOR_COVERING", "DRYWALL_BOARDING", "COATING", "PANEL_CUTTING", "LINEAR_STOCK", "OTHER"]
         .every((id) => main.includes(OMAT_COPY[lang][`omat_app_${id}`])));
-    check(`${lang}: it says what the history does not record`,
-      main.includes(OMAT_COPY[lang].omat_hist_note));
+    // AUDYT3 C6 (commit 45a4dbb51f): price history appears beside rows with history rather than in a static card
+    check(`${lang}: the list container carries the history label`,
+      main.includes(`data-hist-label="${esc(OMAT_COPY[lang].omat_hist_t)}"`));
     check(`${lang}: and where the rows live`, main.includes(OMAT_COPY[lang].omat_sync_note));
   }
 }

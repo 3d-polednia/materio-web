@@ -33,7 +33,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { LANGS, HREFLANG, DEFAULT_LANG } from "../src/site.mjs";
+import { LANGS, HREFLANG, DEFAULT_LANG, SECTION } from "../src/site.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
 import { MONEY_LOCALE } from "../src/currency.mjs";
 
@@ -106,8 +106,15 @@ const REDIRECTS = [];
 /** The error page is the only page the generator does not write. */
 const HAND_WRITTEN = ["404.html"];
 
-/** The 370 per-language pages: the ones whose picker the generator filled in. */
+/** The per-language pages: the ones whose picker the generator filled in. */
 const WITH_PICKER = PAGES.filter((x) => x.html.includes('<span class="lang-btn-name">'));
+/** Token-addressed pages (/wycena/?t=, /maile/?t=) and legacy policy ship with alternates: {}. */
+const SINGLE_LANG = WITH_PICKER.filter((x) =>
+  x.file === "privacy-policy.html" ||
+  x.file.endsWith("/maile/index.html") || x.file === "maile/index.html" ||
+  LANGS.some((l) => x.file === `${SECTION.quoteView[l]}/index.html` || x.file === `${l}/${SECTION.quoteView[l]}/index.html`)
+);
+const FULL_PICKER = WITH_PICKER.filter((x) => !SINGLE_LANG.some((s) => s.file === x.file));
 
 /* ------------------------------------------------------------------ §1 one list */
 
@@ -221,14 +228,14 @@ checkAll("the picker's button names the page's own language", WITH_PICKER,
 
 const namesIn = (block) => words(block).filter((w) => w !== "");
 
-checkAll("the header menu lists all ten, in order, by name", WITH_PICKER,
+checkAll("the header menu lists all ten, in order, by name", FULL_PICKER,
   (x) => {
     const menu = between(x.html, '<ul class="lang-menu"', "</ul>");
     return menu && namesIn(menu).join("|") === LANGS.map((l) => LANG_NAME[l]).join("|");
   },
   (x) => `${x.file}: ${namesIn(between(x.html, '<ul class="lang-menu"', "</ul>") || "").join(", ")}`);
 
-checkAll("the footer's language list says the same ten, in the same order", WITH_PICKER,
+checkAll("the footer's language list says the same ten, in the same order", FULL_PICKER,
   (x) => {
     const nav = between(x.html, '<nav class="foot-langs"', "</nav>");
     if (!nav) return false;
@@ -237,11 +244,18 @@ checkAll("the footer's language list says the same ten, in the same order", WITH
   },
   (x) => `${x.file}: ${namesIn(between(x.html, '<nav class="foot-langs"', "</nav>") || "").slice(1).join(", ")}`);
 
-checkAll("every language link carries the hreflang of the language it names", WITH_PICKER,
+checkAll("every language link carries the hreflang of the language it names", FULL_PICKER,
   (x) => LANGS.filter((l) => l !== DEFAULT_LANG).every((l) => {
     const m = x.html.match(new RegExp(`hreflang="${HREFLANG[l]}" lang="${HREFLANG[l]}" data-lang="${l}"`));
     return Boolean(m);
   }),
+  (x) => x.file);
+
+checkAll("token-addressed and legacy pages drop alternates from the picker", SINGLE_LANG,
+  (x) => {
+    const menu = between(x.html, '<ul class="lang-menu"', "</ul>");
+    return menu && (menu.match(/<li/g) || []).length <= 1;
+  },
   (x) => x.file);
 
 // The net. A name that goes missing again does not throw, does not break a URL and does

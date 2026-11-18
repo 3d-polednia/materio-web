@@ -171,8 +171,8 @@ head("2. a blank, a word and a negative are answered as each reader always answe
   // A calculator field: nothing typed is not a number, and every engine refuses NaN.
   eq("calculators: a blank is not a number", calcNum(""), NaN);
   eq("calculators: a word is not a number", calcNum("dużo"), NaN);
-  // parseFloat's leniency is the site's: "12kg" out of a paste is twelve.
-  eq("calculators: digits with a unit after them are the digits", calcNum("12kg"), 12);
+  // AUDYT3 C1 (commit e379f9359): letters attached to digits are rejected rather than parsed leniently.
+  eq("calculators: digits with a unit after them are not a number", calcNum("12kg"), NaN);
 
   eq("app: a blank is zero", appNum(""), 0);
   eq("app: a word is zero", appNum("dużo"), 0);

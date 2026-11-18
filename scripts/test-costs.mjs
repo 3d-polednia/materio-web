@@ -643,7 +643,7 @@ function loadUi(allow) {
   // Left off the page entirely when `allow` is undefined: that is the case the screens
   // have to close on, and a stub always present would never let it be tested.
   if (allow !== undefined) globals.pwAllows = (feature) => Boolean(allow[feature]);
-  return evalScript(["assets/workspace.js", "assets/workspace-calc.js", "assets/workspace-ui.js"],
+  return evalScript(["assets/units.js", "assets/workspace.js", "assets/workspace-calc.js", "assets/workspace-ui.js"],
     ["wsCanCost", "wsCanPdf", "wsMaterialRow"], {
       ...globals,
       localStorage: { getItem: () => null, setItem() {}, removeItem() {} },

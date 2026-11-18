@@ -368,7 +368,7 @@ head("7. the browser writes no plan, /app/ carries no panel, functions/ is not p
 
   /* Nobody but an administrator downloads it, and no page names it in its markup. */
   check("assets/app.js fetches it, and only for the claim",
-    /claims\[ADMIN_CLAIM\] !== true\) return;\s*\n\s*const mod = await import\("\.\/admin\.js"\)/
+    /claims\[ADMIN_CLAIM\] !== true\) return;[\s\S]*?const mod = await import\(`\.\/admin\.js\$\{stamp\}`\)/
       .test(APP));
   check("signing out takes the panel away again", APP.includes("unmountAdmin()"));
   const shipped = read("app/index.html");

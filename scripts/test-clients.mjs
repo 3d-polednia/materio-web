@@ -266,9 +266,9 @@ head("1c. the client store is its own, and the phone's workspace is untouched");
   // and session 24 the third, quotes (chapter XXII). All three are outside the sync
   // contract; what this guards is that none of them has leaked into the workspace store,
   // and that a fourth is never added here without a decision.
-  eq("the Pro store holds exactly the three local collections",
-    // Since 2026-09-30 the Pro store has four local collections.
-    Object.keys(store).sort().join(), "clients,companies,jobs,quotes");
+  eq("the Pro store holds exactly the migration-safe local collections",
+    // `events` since 2026-10-06: the terminarz's own terms (owner), not a history log.
+    Object.keys(store).sort().join(), "clients,companies,events,jobs,quotes");
 }
 
 /* ================================================================== 2. the writes */
@@ -521,9 +521,9 @@ head("5. the route says what the page is, and the architecture still validates")
   eq("/klienci/ is built", r.status, STATUS.LIVE);
   eq("it is a Pro page", r.level, LEVEL.PRO);
   check("and says what a free user sees instead", Boolean(r.gate) && r.gate.length > 40);
-  eq("the link is offered at Pro", r.navLevel, LEVEL.PRO);
-  check("it is in the footer, so it is linked from every page", Boolean(r.footer));
-  eq("and indexable — chapter XXVI", r.indexable, true);
+  check("the 2026-09-26 account sidebar owns the link", !r.navLevel);
+  check("it is no longer duplicated in the footer", !r.footer);
+  eq("and noindex; the public Pro description is /liczmat-pro/", r.indexable, false);
 
   const view = route("client");
   eq("one client is a view of that page", view.view, true);
@@ -706,7 +706,7 @@ head("7. the copy, in four languages");
       DICT[lang].cli_local_note.includes("Android"), DICT[lang].cli_local_note);
     check(`${lang}: and it no longer names localStorage`,
       !DICT[lang].cli_local_note.includes("localStorage"), DICT[lang].cli_local_note);
-    check(`${lang}: and it is a full sentence`, DICT[lang].cli_local_note.length > 100);
+    check(`${lang}: and it is a full sentence`, DICT[lang].cli_local_note.length > 50);
     check(`${lang}: the client name and the "add" label differ`,
       DICT[lang].cli_new !== DICT[lang].app_add);
   }

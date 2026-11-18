@@ -194,9 +194,8 @@ head("1. one project is a declared screen, not a page that just appeared");
   // The detail is somebody's own project list. There is nothing to rank and the URL
   // needs a key only that browser has.
   eq("and is never indexed", r.indexable, false);
-  // Same argument as /projekty/ and the dashboard: the project is a row in this
-  // browser's localStorage, so reading it cannot require an account.
-  eq("a guest may open it", r.level, LEVEL.GUEST);
+  // LICZMAT since the owner's 2026-09-26 decision that project saving requires an account.
+  eq("it belongs to a free account", r.level, LEVEL.LICZMAT);
   check("it is not in the navigation", !r.header && !r.footer);
 
   for (const lang of LANGS) {
@@ -625,10 +624,10 @@ head("11. the copy, in four languages");
 head("12. the header carries six links, and one of them is only offered with an account");
 {
   const inHeader = navRoutes("header");
-  eq("six links in the header", inHeader.length, 6);
+  eq("five links in the header", inHeader.length, 5);
   eq("and they are in the architecture's order",
     inHeader.map((r) => r.id).join(","),
-    "calculators,materials,stores,projects,liczmat-pro,android");
+    "calculators,materials,stores,liczmat-pro,android");
 
   // Session 40: "Poradniki" gave slot 4 up to /liczmat-pro/. The guides did not go
   // anywhere — the route is still LIVE and still in the footer — so the test says both
@@ -648,27 +647,28 @@ head("12. the header carries six links, and one of them is only offered with an 
   // pushing the app on the home page; a link last in the row is not that.
   const android = route("android");
   check("the app page is in the header", Boolean(android.header));
-  eq("last, behind the five tools", android.header.order, 6);
+  eq("last, behind the four tools", android.header.order, 6);
   eq("with the label it already had in the footer", android.header.key, "nav_app_page");
 
   // A seventh link has never been measured, so the build still refuses it.
-  const spare = ROUTES.find((r) => r.id === "guides");
-  const was = spare.header;
-  spare.header = { order: 7, key: "foot_guides" };
+  const spare1 = ROUTES.find((r) => r.id === "guides");
+  const spare2 = ROUTES.find((r) => r.id === "privacy");
+  const was1 = spare1.header, was2 = spare2.header;
+  spare1.header = { order: 6, key: "foot_guides" };
+  spare2.header = { order: 7, key: "nav_privacy" };
   check("a seventh link still aborts the build",
     validateIA().some((p) => /links in the header/.test(p)), validateIA().join("\n      "));
-  spare.header = was;
+  spare1.header = was1;
+  spare2.header = was2;
   check("and the architecture is happy once it is put back", validateIA().length === 0);
 }
 
-head("13. /projekty/ hides its link without gating its page");
+head("13. /projekty/ belongs to an account, and the account sidebar owns its link");
 {
   const r = route("projects");
-  // The two are deliberately different, and that difference is the whole change: `level`
-  // is who may use the page, `navLevel` is who is offered the link.
-  eq("a guest may still use the page", r.level, LEVEL.GUEST);
-  eq("but the link is for an account", r.navLevel, LEVEL.LICZMAT);
-  eq("and the page stays in the index", r.indexable, true);
+  eq("projects requires an account", r.level, LEVEL.LICZMAT);
+  check("the 2026-09-26 account sidebar owns the link", !r.navLevel && !r.header && !r.footer);
+  eq("and noindex; the public Pro description is /liczmat-pro/", r.indexable, false);
   check("the build still writes its file", livePaths(CALCS, GUIDES).has("projekty/index.html"));
 
   // A link nobody could ever be shown is a mistake the build has to catch.
@@ -686,29 +686,17 @@ head("13. /projekty/ hides its link without gating its page");
   delete guides.navLevel;
   check("the architecture is happy once both are put back", validateIA().length === 0);
 
-  // The markup: the item carries the level, so CSS can take the whole <li> out of the row
-  // rather than leaving the gap an empty one would.
   const t = tr(DEFAULT_LANG);
   const header = siteHeader({ lang: DEFAULT_LANG, t, alternates: {}, path: urlProjects(DEFAULT_LANG) });
-  check("the header item carries the level",
-    header.includes('<li data-nav-level="liczmat">'), header.slice(0, 400));
-  check("and only that one does",
-    (header.match(/data-nav-level=/g) || []).length === 1);
   check("the app page is in the rendered header", header.includes(t("nav_app_page")));
-
-  const footer = siteFooter({ lang: DEFAULT_LANG, t, alternates: {} });
-  check("the footer item carries it too", footer.includes('<li data-nav-level="liczmat">'));
 
   // The rule that hides it must never fire without the level being known: no `data-lm-level`
   // is a guest *or* a browser with no script, and the second one is Googlebot.
   const css = readFileSync(p("assets/styles.css"), "utf8");
   check("the stylesheet only hides it once the level is known",
     css.includes('html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) [data-nav-level="liczmat"]'));
-  // A built page is the proof: the link is in the HTML for everybody, and it is the
-  // stylesheet — not the build — that takes it away.
+  // A built page is the proof: the app page is in the HTML for everybody.
   const built = readFileSync(p("index.html"), "utf8");
-  check("the home page ships the link in its markup",
-    built.includes('<li data-nav-level="liczmat">'));
   check("and ships the app page beside it", built.includes(">Aplikacja</a>"));
 
   // The level has to be stamped **before the first paint**, or a signed-in visitor watches
