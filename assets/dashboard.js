@@ -33,7 +33,6 @@
  */
 
 /** How many rows each section shows before the "see all" link takes over. */
-const DASH_PROJECTS = 4;
 const DASH_LINES = 5;
 const DASH_TOOLS = 4;
 
@@ -81,32 +80,6 @@ function dashCanCost() {
   return typeof lmCan === "function" && lmCan("costs", level);
 }
 
-/* ------------------------------------------------------------------ the identity strip */
-
-/**
- * Which of chapter II's three levels this browser was last told it is on.
- *
- * `lmReadLevel()` is a copy hint (assets/account.js): it can be stale, so it decides
- * wording and the sign-up card, and nothing else. Nothing on this page is gated on it —
- * the projects below belong to the browser, not to the account, and hiding them from
- * somebody whose token quietly expired would be losing their work in front of them.
- */
-function dashRenderLevel() {
-  const chip = document.getElementById("dash-level");
-  if (!chip) return;
-  const level = typeof lmReadLevel === "function" ? lmReadLevel() : "guest";
-  const name = { guest: "acc_guest_t", liczmat: "acc_liczmat_t", pro: "acc_pro_t" }[level];
-  const note = { guest: "dash_level_guest", liczmat: "dash_level_in", pro: "dash_level_pro" }[level];
-
-  chip.textContent = dashT(name);
-  chip.classList.toggle("on", level !== "guest");
-  const line = document.querySelector("[data-dash-note]");
-  if (line) line.textContent = dashT(note);
-
-  const signup = document.getElementById("dash-signup");
-  if (signup) signup.hidden = level !== "guest";
-}
-
 /** Point every "see all" link and quick action at the language showing right now. */
 function dashRenderLinks() {
   document.querySelectorAll("[data-dash-url]").forEach((a) => {
@@ -118,50 +91,6 @@ function dashRenderLinks() {
 function dashProjectUrl(projectId) {
   const base = dashUrl("projects");
   return projectId ? `${base}?id=${encodeURIComponent(projectId)}` : base;
-}
-
-/* ------------------------------------------------------------------ projekty */
-
-function dashRenderProjects() {
-  const list = document.getElementById("dash-projects");
-  if (!list) return;
-  const projects = wsProjects();
-  const canCost = dashCanCost();
-
-  if (!projects.length) { list.innerHTML = dashEmpty("dash_projects_empty"); return; }
-
-  list.innerHTML = projects.slice(0, DASH_PROJECTS).map((p) => {
-    const total = wsProjectTotal(p.id);
-    // The money is chapter XVII's project total — the materials plus the costs nothing
-    // calculated — so the dashboard, /projekty/ and the project screen give one answer to
-    // "what does this cost". The count beside it is still the count of saved lines.
-    // PRO since 2026-09-04 (dashCanCost()): a free account or a guest gets the count and
-    // the date and nothing else — wsProjectCosts() is not even asked.
-    let money = "";
-    let mixed = "";
-    if (canCost) {
-      // Per currency: two currencies in a project are two sums, and wsProjectCosts()
-      // hands out no single `total` for one of those.
-      const costs = wsProjectCosts(p.id);
-      const sums = wsSumsText(costs.byCurrency, "total");
-      money = sums ? ` · ${dashEsc(sums)}` : "";
-      // Lines saved in different currencies do not add up. /kosztorys/ has room for the
-      // whole sentence; a row has room for two words and the sentence as its tooltip. What
-      // it must not do is print the sum as though it meant something.
-      mixed = costs.mixed
-        ? ` <span class="chip warn" title="${dashEsc(dashT("ws_mixed_currency"))}">${dashEsc(dashT("dash_mixed"))}</span>`
-        : "";
-    }
-    return `<li data-id="${dashEsc(p.id)}">
-        <span class="row-name">
-          <b>${dashEsc(p.name)}</b>
-          <em class="muted">${total.count} ${dashEsc(dashUnit("ws_lines", total.count))}${money} · ${dashEsc(dashDate(p.updatedAt))}${mixed}</em>
-        </span>
-        <span class="row-actions">
-          <button type="button" class="btn btn-ghost btn-sm" data-open>${dashEsc(dashT("dash_open"))}</button>
-        </span>
-      </li>`;
-  }).join("");
 }
 
 /* ------------------------------------------------------------------ ostatnie kalkulacje */
@@ -255,26 +184,13 @@ function dashRenderTools() {
 /* ------------------------------------------------------------------ wiring */
 
 function dashRender() {
-  dashRenderLevel();
   dashRenderLinks();
-  dashRenderProjects();
   dashRenderRecent();
   dashRenderTools();
 }
 
 function buildDashboard() {
-  const list = document.getElementById("dash-projects");
-  if (!list && !document.getElementById("dash-recent") && !document.getElementById("dash-tools")) return;
-
-  // Opening a project means two things — make it the one the estimate page is about, and
-  // go there. The dashboard is a way in, so it does both rather than leaving the visitor
-  // to pick the project again one page later.
-  if (list) list.addEventListener("click", (e) => {
-    const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-open]")) return;
-    wsSetActiveProject(li.dataset.id);
-    location.href = dashUrl("estimate");
-  });
+  if (!document.getElementById("dash-recent") && !document.getElementById("dash-tools")) return;
 
   const forget = document.getElementById("dash-tools-forget");
   if (forget) forget.addEventListener("click", () => {

@@ -593,7 +593,7 @@ head("11. the copy, in four languages");
     "proj_archive_do", "proj_archive_undo", "proj_archive_t", "proj_archive_d",
     "proj_delete_yes", "proj_deleted", "proj_restored", "proj_undo",
     // Reused rather than written again: the question, the state, the two verbs.
-    "ws_confirm_delete", "ws_active", "ws_activate", "ws_rename", "ws_lines",
+    "ws_confirm_delete", "ws_rename", "ws_lines",
     "app_delete", "app_save", "app_add", "action_cancel", "share_total", "dash_mixed",
   ];
   for (const key of KEYS) {

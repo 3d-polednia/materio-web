@@ -551,111 +551,6 @@ const QUICK_ACTIONS = [
   },
 ];
 
-/**
- * The dashboard of the free account — session 14, chapter XIV of the sessions list:
- * projects, recent calculations, quick actions, recently used tools.
- *
- * Everything on it comes out of this browser: `assets/workspace.js` (projects, rooms and
- * estimate lines, in the Firestore document shape) and `assets/recent.js` (which
- * calculators were used). **No Firebase.** That is the whole point of the page — it is
- * the first screen after signing in, and making it wait for an SDK download and an auth
- * round-trip before it can list somebody's own local projects would be slower than the
- * calculator it came from. The level shown in the strip is the copy hint from
- * assets/account.js: an optimistic first-paint hint confirmed by Firebase when claiming Pro: a guest sees their own data and a
- * card explaining what an account adds, not a locked door.
- *
- * The lists are drawn by assets/dashboard.js. What the build renders is the frame — the
- * headings, the quick actions as real links, and one empty state per section — so the
- * page is readable and navigable before a single list has been filled in.
- */
-export function dashboardMain(t) {
-  const i = (key, tag = "span", cls = "") =>
-    `<${tag}${cls ? ` class="${cls}"` : ""} data-i18n="${key}">${esc(t(key))}</${tag}>`;
-
-  const quick = QUICK_ACTIONS.map((a) => `<li><a class="calc-link" href="${a.href || DASH_HREF[a.url]}"${
-    a.url ? ` data-dash-url="${a.url}"` : ""}>
-        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${a.icon}</svg></span>
-        <span class="calc-link-body">
-          <b data-i18n="${a.key}">${esc(t(a.key))}</b>
-          <span class="muted" data-i18n="${a.key}_d">${esc(t(`${a.key}_d`))}</span>
-        </span>
-      </a></li>`).join("\n        ");
-
-  /** A section with a heading, a "see all" link beside it and a list the script fills. */
-  const section = (id, titleKey, allKey, urlKey, listClass) =>
-    `<section class="dash-sec" aria-labelledby="dash-${id}-h">
-        <div class="dash-head">
-          <h2 id="dash-${id}-h" data-i18n="${titleKey}">${esc(t(titleKey))}</h2>
-          <a class="dash-more" href="${DASH_HREF[urlKey]}" data-dash-url="${urlKey}" data-i18n="${allKey}">${esc(t(allKey))}</a>
-        </div>
-        <ul class="${listClass}" id="dash-${id}"></ul>
-      </section>`;
-
-  const main = `<main id="main" tabindex="-1">
-  <section class="block page-head">
-    <div class="wrap">
-      <h1 data-i18n="dash_title">${esc(t("dash_title"))}</h1>
-      <p class="lead" data-i18n="dash_lead">${esc(t("dash_lead"))}</p>
-    </div>
-  </section>
-
-  <section class="block alt">
-    <div class="wrap">
-      <!-- Which of chapter II's three levels this browser was last told it is on. It is
-           a hint (assets/account.js), so it words the strip and nothing else. -->
-      <div class="app-bar">
-        <span class="app-identity">
-          <span id="dash-level" class="chip">${esc(t("acc_guest_t"))}</span>
-          <span class="muted" id="dash-level-note" data-dash-note>${esc(t("dash_level_guest"))}</span>
-        </span>
-        <a class="btn btn-ghost btn-sm btn-go" href="${URL_APP}" data-i18n="dash_q_account">${esc(t("dash_q_account"))}</a>
-      </div>
-
-      <!-- Chapter II: registration is the next step after a result, never a barrier. The
-           card is what a guest sees; assets/dashboard.js hides it once the hint says
-           somebody signed in. It opens the sign-up form and comes back here. -->
-      <div class="app-card" id="dash-signup">
-        <!-- An <h2>, not an <h3>: this card is the first thing under the page's own <h1>,
-             so the level below it is the only one that leaves no hole in the outline. -->
-        <h2 data-i18n="dash_guest_t">${esc(t("dash_guest_t"))}</h2>
-        ${i("dash_guest_d", "p", "muted")}
-        <a class="btn btn-primary btn-sm btn-go" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_APP)}" data-i18n="dash_guest_go">${esc(t("dash_guest_go"))}</a>
-      </div>
-
-      <section class="dash-sec" aria-labelledby="dash-quick-h">
-        <h2 id="dash-quick-h" data-i18n="dash_quick_t">${esc(t("dash_quick_t"))}</h2>
-        <ul class="calc-links dash-quad">
-        ${quick}
-        </ul>
-      </section>
-
-      <!-- At wide-screen width these two equally weighted lists become columns instead
-           of stretching individual rows across the whole public content cap. -->
-      <div class="dash-list-grid">
-        ${section("projects", "dash_projects_t", "dash_projects_all", "projects", "data-list")}
-        ${section("recent", "dash_recent_t", "dash_recent_all", "estimate", "data-list")}
-      </div>
-
-      <section class="dash-sec" aria-labelledby="dash-tools-h">
-        <div class="dash-head">
-          <h2 id="dash-tools-h" data-i18n="dash_tools_t">${esc(t("dash_tools_t"))}</h2>
-          <a class="dash-more" href="${DASH_HREF.calculators}" data-dash-url="calculators" data-i18n="dash_tools_all">${esc(t("dash_tools_all"))}</a>
-        </div>
-        <ul class="calc-links dash-quad" id="dash-tools"></ul>
-        <!-- The list is the visitor's own history of which tools they opened, so they get
-             to delete it, on the page that shows it. Hidden while there is nothing to
-             forget — chapter XXV: no button that does nothing. -->
-        <p><button type="button" class="linkish" id="dash-tools-forget" data-i18n="dash_tools_forget" hidden>${esc(t("dash_tools_forget"))}</button></p>
-      </section>
-
-      ${i("dash_local_note", "p", "muted src-note")}
-    </div>
-  </section>
-</main>`;
-  return chrome(t, main);
-}
-
-/** The retained dashboard URL now forwards to the account overview without losing a real link. */
 export function dashboardRedirectMain(t) {
   return chrome(t, `<main id="main" tabindex="-1">
     <section class="block page-head"><div class="wrap narrow">
@@ -670,9 +565,8 @@ export const appProKeys = (features) => ["app_tab_pro", ...proKeys(features)];
 
 /** Every dictionary key the dashboard renders, so the build can check all four languages. */
 export const dashboardKeys = () => [
-  "dash_title", "dash_lead", "dash_level_guest", "dash_level_in", "dash_level_pro",
-  "dash_guest_t", "dash_guest_d", "dash_guest_go",
-  "dash_quick_t", "dash_projects_t", "dash_projects_all", "dash_projects_empty",
+  "dash_title", "dash_lead",
+  "dash_projects_t", "dash_projects_all", "dash_projects_empty",
   "dash_recent_t", "dash_recent_all", "dash_recent_empty",
   "dash_tools_t", "dash_tools_all", "dash_tools_empty", "dash_tools_forget",
   "dash_open", "dash_mixed", "dash_local_note", "nav_dashboard",

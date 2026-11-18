@@ -382,9 +382,12 @@ const note = (map, key, file) => {
   if (!map.has(key)) map.set(key, new Set());
   map.get(key).add(file);
 };
+// Translation wrappers: t(), T(), and helpers forwarding to t() or unitLabel().
+// Listed explicitly to avoid matching unrelated functions ending in T.
+const TRANSLATION_CALLS = /\b(?:[tT]|wsT|dashT|pwT|quoT|crmT|omuT|calT|sgT|companyT|matT|chnT|wsUnit|dashUnit)\(\s*(["'])([a-z0-9][a-z0-9_]*)\1(\s*\+)?/g;
 for (const file of SOURCES) {
   const src = readFileSync(join(ROOT, file), "utf8");
-  for (const m of src.matchAll(/\b[tT]\(\s*(["'])([a-z0-9][a-z0-9_]*)\1(\s*\+)?/g)) {
+  for (const m of src.matchAll(TRANSLATION_CALLS)) {
     note(m[3] ? family : literal, m[2], file);
   }
 }

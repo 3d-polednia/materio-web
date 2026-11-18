@@ -20,7 +20,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { LEVEL, STATUS, route, validateIA, FLOWS } from "../src/ia.mjs";
-import { dashboardMain, dashboardKeys } from "../src/app-pages.mjs";
+import { dashboardRedirectMain, appMain, dashboardKeys } from "../src/app-pages.mjs";
 import {
   LANGS, DEFAULT_LANG, URL_DASHBOARD, URL_APP,
   urlCalcIndex, urlProjects, urlQuotes, urlCalc, CALC_SLUG,
@@ -85,7 +85,7 @@ function loadDashboard(lmDash, lang) {
     addEventListener() {},
   };
   return evalScript("assets/dashboard.js", [
-    "DASH_PROJECTS", "DASH_LINES", "DASH_TOOLS", "DASH", "dashUrl", "dashLang", "dashProjectUrl",
+    "DASH_LINES", "DASH_TOOLS", "DASH", "dashUrl", "dashLang", "dashProjectUrl",
   ], { document, window: { LM_DASH: lmDash } });
 }
 
@@ -204,40 +204,38 @@ head("4. a tool counts as used when the visitor asked for the number");
 
 /* ------------------------------------------------------------------ 5. the page */
 
-head("5. the four things chapter XIV asks the dashboard to show");
+head("5. the redirect page and the overview that replaced the panel");
 {
-  const html = dashboardMain(tr(DEFAULT_LANG));
-  const has = (needle, what) => check(what, html.includes(needle), `not in the page: ${needle}`);
+  const redirect = dashboardRedirectMain(tr(DEFAULT_LANG));
+  check("redirect links to /app/", redirect.includes(`href="${URL_APP}"`));
 
-  has('id="dash-quick-h"', "szybkie akcje — the section is there");
-  has('id="dash-projects"', "projekty — the list is there");
+  const app = appMain(tr(DEFAULT_LANG), [], false);
+  const has = (needle, what) => check(what, app.includes(needle), `not in the page: ${needle}`);
+
   has('id="dash-recent"', "ostatnie kalkulacje — the list is there");
   has('id="dash-tools"', "ostatnio używane narzędzia — the list is there");
-  has('id="dash-level"', "and the strip says which level this browser is on");
-  has('id="dash-signup"', "a guest is offered an account rather than a locked door");
-  has(`href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_APP)}"`,
-    "and the offer opens the sign-up form and comes back here");
   has('id="dash-tools-forget"', "the visitor can delete their own history of tools");
 
   // Every heading is a real heading, so the page has an outline on a screen reader.
-  for (const id of ["quick", "projects", "recent", "tools"]) {
+  for (const id of ["recent", "tools"]) {
     check(`the "${id}" section is labelled by its own heading`,
-      html.includes(`aria-labelledby="dash-${id}-h"`) && html.includes(`id="dash-${id}-h"`));
+      app.includes(`aria-labelledby="dash-${id}-h"`) && app.includes(`id="dash-${id}-h"`));
   }
 
   // The quick actions and the "see all" links are real links with real addresses: this
   // page needs a script for its lists, and must not need one to get anywhere.
-  const hrefs = [...html.matchAll(/href="([^"]+)" data-dash-url="([^"]+)"/g)];
-  eq("six links carry an address the script re-points", hrefs.length, 6);
+  const hrefs = [...app.matchAll(/href="([^"]+)" data-dash-url="([^"]+)"/g)];
+  check("links carry an address the script re-points", hrefs.length >= 2);
   const want = {
     calculators: urlCalcIndex(DEFAULT_LANG),
-    projects: urlProjects(DEFAULT_LANG),
     estimate: urlQuotes(DEFAULT_LANG),
   };
   for (const [, href, key] of hrefs) {
-    eq(`the "${key}" link points at ${want[key]} before any script runs`, href, want[key]);
+    if (want[key]) {
+      eq(`the "${key}" link points at ${want[key]} before any script runs`, href, want[key]);
+    }
   }
-  check("none of them is a placeholder", !html.includes('href="/" data-dash-url'));
+  check("none of them is a placeholder", !app.includes('href="/" data-dash-url'));
 }
 
 head("6. the addresses the build hands the page");
@@ -296,7 +294,7 @@ head("7. the copy exists in all four languages");
   const KEYS = [
     ...dashboardKeys(),
     // Rendered by assets/dashboard.js into the rows themselves.
-    "acc_guest_t", "acc_liczmat_t", "acc_pro_t", "ws_lines", "ws_active", "ws_mixed_currency",
+    "acc_guest_t", "acc_liczmat_t", "acc_pro_t", "ws_lines", "ws_mixed_currency",
     // The new localStorage key has to be named on /cookies/, next to the other two.
     "ck_p_recent",
   ];
@@ -333,7 +331,7 @@ head("9. how much of each list the dashboard shows");
   const data = { urls: { calculators: { pl: "/kalkulatory/", de: "/de/rechner/" } }, calcs: {} };
   const dash = loadDashboard(data, "de");
   check("each section is a shortlist, not the whole store",
-    dash.DASH_PROJECTS > 0 && dash.DASH_LINES > 0 && dash.DASH_TOOLS > 0);
+    dash.DASH_LINES > 0 && dash.DASH_TOOLS > 0);
   eq("the page it is on is the language it renders", dash.dashLang(), "de");
   eq("a link follows that language", dash.dashUrl("calculators"), "/de/rechner/");
   eq("a calculation opens its project", dash.dashProjectUrl("projekt 1"), "/?id=projekt%201");

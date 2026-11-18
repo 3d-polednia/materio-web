@@ -54,7 +54,7 @@ import { OMAT_COPY, OMAT_COPY_KEYS } from "../src/omat-copy.mjs";
 import { QUOTE_VIEW_COPY, QUOTE_VIEW_COPY_KEYS } from "../src/quote-view-copy.mjs";
 import { MAIL_PAGE_COPY, MAIL_PAGE_COPY_KEYS } from "../src/mail-page-copy.mjs";
 import { PDF_COPY, PDF_COPY_KEYS } from "../src/pdf-copy.mjs";
-import { appMain, shareMain, dashboardMain, dashboardRedirectMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
+import { appMain, shareMain, dashboardRedirectMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 import { nbspHtml, nbspShortWords } from "../src/nbsp.mjs";
 import {
   privacyMain, privacyLegacyMain, privacyBreadcrumbLd, privacyDescription, PRIVACY,
@@ -67,7 +67,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20261118a";
+const STAMP = "20261118b";
 
 /* ------------------------------------------------------------------ load sources */
 
