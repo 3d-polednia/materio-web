@@ -167,7 +167,17 @@ async function openApp(ctx, url, opts = {}) {
   });
   page.on("pageerror", (e) => errors.push(String(e)));
   const isAppPage = url.startsWith("/app/");
-  await page.addInitScript(([accounts, docs, storage, fromCache, isApp, latencyMs]) => {
+  await page.addInitScript(([accounts, docs, storage, fromCache, isApp, latencyMs, signedIn]) => {
+    // fake-firebase keeps its user in localStorage so a reload or a navigation in the same
+    // tab stays signed in, as the real SDK does. A page opened here is a new visitor unless
+    // the test says otherwise: forget a user an earlier page of this context left behind.
+    try {
+      if (!sessionStorage.getItem("__fb_tab")) {
+        sessionStorage.setItem("__fb_tab", "1");
+        if (!signedIn) localStorage.removeItem("__fb_signed_in");
+      }
+    } catch (e) {}
+    if (signedIn) window.__fbSignedIn = signedIn;
     window.__fbAccounts = accounts;
     window.__fbSeed = docs;
     if (latencyMs !== undefined) window.__fbLatencyMs = latencyMs;
@@ -184,7 +194,7 @@ async function openApp(ctx, url, opts = {}) {
       window.__fbDocs = new Map(Object.entries(docs));
     }
   }, [opts.accounts || {}, opts.docs || {}, opts.storage || {}, Boolean(opts.fromCache), isAppPage,
-    opts.latencyMs]);
+    opts.latencyMs, opts.signedIn]);
   await page.goto(base + url, { waitUntil: "domcontentloaded" });
   // /app/ boots asynchronously — it imports the SDK, then wires the forms — and sets
   // data-app-ready when it is done. Clicking before that clicks a button nothing is
@@ -729,8 +739,8 @@ head("9. the level comes from the profile the server owns");
   await signedIn(free);
   eq("plan free is the LiczMat level", await free.locator("#app-level").innerText(), "LiczMat");
   await free.click('.app-nav-item[href$="#profil"]');
-  eq("and the profile marks that card",
-    await free.locator("#panel-profile .lvl-card[data-current] h3").innerText(), "LiczMat");
+  // Commit 4df1726c2 & test-account.mjs:272: level comparison left the profile tab
+  check("the profile does not repeat level cards", (await free.locator("#panel-profile [data-levels]").count()) === 0);
   await free.close();
 
   const pro = await openApp(ctx, "/app/", {
@@ -745,18 +755,9 @@ head("9. the level comes from the profile the server owns");
   eq("and the rest of the site is told so",
     await pro.evaluate(() => localStorage.getItem("liczmat-signed-in")), "pro");
   await pro.click('.app-nav-item[href$="#profil"]');
-  eq("the profile marks the Pro card",
-    await pro.locator("#panel-profile .lvl-card[data-current] h3").innerText(), "LiczMat Pro");
-  /* Session 29 gave the card the one link chapter XXV asks for — "Poznaj LiczMat Pro",
-     pointing at the page that explains the level. What it must still not carry is a
-     button: the checkout lives on the Pro tab and only there, because that is the one
-     place that knows the uid a payment attaches to. A second button here would be a
-     second way to pay, and the two would have to be kept in step for ever. */
-  eq("the card points at the page that explains the level",
-    await pro.locator('#panel-profile .lvl-card[data-level="pro"] a').getAttribute("href"),
-    "/liczmat-pro/");
-  check("and still offers nothing to buy — nothing grants the plan yet",
-    (await pro.locator('#panel-profile .lvl-card[data-level="pro"] button').count()) === 0);
+  await pro.waitForSelector("#panel-profile:not([hidden])", { timeout: 3000 });
+  check("the profile does not repeat level cards", (await pro.locator("#panel-profile [data-levels]").count()) === 0);
+  check("the profile tab is visible", await pro.locator("#panel-profile").isVisible());
   eq("no console error", pro.lmErrors.join(" / "), "");
   await pro.close();
   await ctx.close();
@@ -800,7 +801,7 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
   eq("the panel offers the portal, the way to the Pro page and the checkout",
     (await free.$$eval("#panel-pro a, #panel-pro button",
       (ns) => ns.map((n) => n.getAttribute("href") || n.id || "checkout").join(" "))),
-    "# /liczmat-pro/ checkout checkout");
+    "# /liczmat-pro/ checkout checkout /regulamin/");
   /* One checkout on the tab, and it is visible now: the uid this payment attaches to is
      known here and nowhere else, which is why every wall on the site sends people to this
      page instead of carrying a button of its own. */
@@ -871,8 +872,8 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
   check("and the card explains what happens then",
     (await cancelled.locator("#plan-note").innerText()).includes("do końca opłaconego okresu"),
     await cancelled.locator("#plan-note").innerText());
-  // Resuming happens in Stripe's portal, without opening a second checkout.
-  eq("the plans are not offered again", await cancelled.locator("#plan-buy").isVisible(), false);
+  // Owner decision (commit aa4caf1c1): cancelled plan lands with 'Wznów' first and the buy buttons back
+  eq("the plans are offered again", await cancelled.locator("#plan-buy").isVisible(), true);
   eq("the portal becomes the resume action",
     await cancelled.locator("#plan-manage-link").innerText(), "Wznów subskrypcję");
   await cancelled.close();
@@ -1203,9 +1204,10 @@ head("12c. deleting the account, against the rules as deployed today");
   await page.click("#app-delete-yes");
   await page.waitForSelector("#app-status.err", { timeout: 5000 });
 
+  // Commit 092fe0104: no AI dashes anywhere on the site
   eq("the visitor is told the refusal, not \"something went wrong\"",
     await page.locator("#app-status").innerText(),
-    "Nie udało się usunąć konta — serwer odrzucił żądanie. Twoje dane są nietknięte. " +
+    "Nie udało się usunąć konta. Serwer odrzucił żądanie. Twoje dane są nietknięte. " +
     "Napisz do nas, usuniemy je ręcznie.");
   const left = await page.evaluate(() => [...window.__fbDocs.keys()].sort());
   check("and nothing was destroyed on the way to finding out",
@@ -1304,6 +1306,8 @@ head("13. the session, as the other pages see it");
   await guest.close();
 
   const member = await openApp(ctx, "/kalkulatory/plytki-panele-gres/", {
+    signedIn: "u1",
+    docs: { "users/u1": { plan: "free" } },
     storage: { "liczmat-signed-in": "liczmat" },
   });
   check("with a session, the sentence is about sync instead",
@@ -1316,21 +1320,38 @@ head("13. the session, as the other pages see it");
   await member.close();
 
   const pro = await openApp(ctx, "/en/calculators/tiles-panels-porcelain/", {
+    signedIn: "u1",
+    docs: { "users/u1": { plan: "premium" } },
     storage: { "liczmat-signed-in": "pro" },
   });
   eq("Pro keeps the same plain account action",
     await pro.locator(".nav-cta").getAttribute("title"), null);
   await pro.close();
 
-  // The hint decides copy and nothing else. Saving a result must work with it absent,
-  // present, or stale — FIRESTORE_SYNC §1.2.
+  // Saving into a project needs a free account since 72d293a11 (owner, 2026-09-26), so
+  // the save is checked for a real session (fake Firebase user u1, plan free).
+  const saver = await openApp(ctx, "/kalkulatory/plytki-panele-gres/", {
+    signedIn: "u1",
+    docs: { "users/u1": { plan: "free" } },
+    storage: { "liczmat-signed-in": "liczmat" },
+  });
+  await saver.click("[data-ws-save]");
+  const lines = await saver.evaluate(() =>
+    JSON.parse(localStorage.getItem("materio-workspace-v1")).estimations.length);
+  check("a signed-in free account saves a result into a project", lines === 1, `saved ${lines}`);
+  await saver.close();
+
+  // Since 2026-11-18 the calculator page confirms the hint with Firebase: a hint left
+  // behind by a session that is gone (signed out in another tab, an expired token) is put
+  // back to guest instead of being believed for the rest of the visit.
   const stale = await openApp(ctx, "/kalkulatory/plytki-panele-gres/", {
     storage: { "liczmat-signed-in": "liczmat" },
   });
-  await stale.click("[data-ws-save]");
-  const lines = await stale.evaluate(() =>
-    JSON.parse(localStorage.getItem("materio-workspace-v1")).estimations.length);
-  check("a result still saves with a session hint present", lines === 1, `saved ${lines}`);
+  const corrected = await stale.waitForFunction(
+    () => localStorage.getItem("liczmat-signed-in") === null, null, { timeout: 10000 },
+  ).then(() => true, () => false);
+  check("a stale hint with no Firebase session is put back to guest", corrected,
+    String(await stale.evaluate(() => localStorage.getItem("liczmat-signed-in"))));
   await stale.close();
   await ctx.close();
 }
@@ -1580,7 +1601,7 @@ head("18. the offline notice: up when it is true, down when it is not");
   eq("the browser saying it is offline puts the notice up at once",
     await page.locator("#app-offline").isHidden(), false);
   eq("and it says so", await page.locator("#app-offline").innerText(),
-    "Brak sieci — zmiany polecą po powrocie łącza.");
+    "Brak sieci. Zmiany polecą po powrocie łącza.");
   eq("without taking down the message that was already there",
     await page.locator("#app-status").innerText(), "Nazwa zapisana.");
   eq("and it is not styled as an error", await page.locator("#app-offline.err").count(), 0);
@@ -1591,7 +1612,7 @@ head("18. the offline notice: up when it is true, down when it is not");
   await page.click("#lang-toggle");
   await pickLang(page, "de");
   eq("the notice follows the language picker", await page.locator("#app-offline").innerText(),
-    "Kein Netz — Änderungen gehen raus, sobald die Verbindung zurück ist.");
+    "Kein Netz. Änderungen gehen raus, sobald die Verbindung zurück ist.");
 
   await ctx.setOffline(false);
   await page.evaluate(() => window.__fbSync(false));

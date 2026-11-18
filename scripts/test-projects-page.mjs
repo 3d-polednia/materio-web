@@ -475,9 +475,10 @@ head("8b. delete from a project row — warning, cancel and undo");
     (await page.locator('#ws-project-list li[data-id="p1"] [data-del-project]').innerText()).trim(), "Usuń projekt");
   await page.click('#ws-project-list li[data-id="p1"] [data-del-project]');
   const ask = '#ws-project-list li[data-id="p1"] .ws-row-ask';
+  // D5 (commit 1d6e14aa0): warning names the cascade tombstone counts
   check("the row warning has counts and the room destination",
-    (await page.locator(ask).innerText()).includes("kalkulacje (2)")
-      && (await page.locator(ask).innerText()).includes("Pomieszczenia (1)"));
+    (await page.locator(ask).innerText()).includes("1 pomieszczenia")
+      && (await page.locator(ask).innerText()).includes("2 kalkulacji"));
   eq("focus moves to cancel", await page.locator(`${ask} [data-cancel-del-project]`).evaluate((n) => n === document.activeElement), true);
   await page.click(`${ask} [data-cancel-del-project]`);
   eq("cancel closes the warning", await page.locator(ask).count(), 0);
@@ -488,16 +489,14 @@ head("8b. delete from a project row — warning, cancel and undo");
   const after = await store(page);
   eq("confirm removes the project row", await page.locator('#ws-project-list li[data-id="p1"]').count(), 0);
   eq("its room keeps its link in storage", after.rooms.find((r) => r.id === "r1").projectId, "p1");
-  eq("the deleted project's room moves under Bez projektu", await page.locator('#ws-room-list [data-project-id=""] li[data-id="r1"]').count(), 1);
-  const looseSelects = page.locator('#ws-room-list [data-project-id=""] [data-room-project]');
-  check("the loose room has an assignment control", await looseSelects.count() > 0);
-  await looseSelects.first().selectOption("p2");
-  eq("assigning it moves it into that project's card", await page.locator('#ws-room-list [data-project-id="p2"] li[data-id="r1"]').count(), 1);
-  eq("and the store carries the new project", (await store(page)).rooms.find((r) => r.id === "r1").projectId, "p2");
+  // D5 (commit 1d6e14aa0): deleting a project tombstones its rooms too, and undo brings both back
+  check("its room is tombstoned", Boolean(after.rooms.find((r) => r.id === "r1").deletedAt));
+  eq("the deleted project's room is removed from the room list", await page.locator('#ws-room-list li[data-id="r1"]').count(), 0);
   await page.click("#ws-undo-go");
   const back = await store(page);
   eq("undo restores the row", await page.locator('#ws-project-list li[data-id="p1"]').count(), 1);
-  eq("undo does not undo the later room assignment", back.rooms.find((r) => r.id === "r1").projectId, "p2");
+  eq("undo restores the room", back.rooms.find((r) => r.id === "r1").deletedAt, null);
+  eq("and the room is back under its project", await page.locator('#ws-room-list [data-project-id="p1"] li[data-id="r1"]').count(), 1);
   await page.close();
 }
 
@@ -509,9 +508,10 @@ head("9. delete — asked on the page, and taken back");
 
   await page.click("#ws-project-delete");
   eq("pressing delete asks", await page.$eval("#ws-delete-ask", (n) => n.hidden), false);
+  // D5 (commit 1d6e14aa0): warning names the cascade tombstone counts
   check("the warning names the lines and room move",
-    (await text(page, "#ws-delete-q")).includes("kalkulacje (2)")
-      && (await text(page, "#ws-delete-q")).includes("Pomieszczenia (1)"));
+    (await text(page, "#ws-delete-q")).includes("1 pomieszczenia")
+      && (await text(page, "#ws-delete-q")).includes("2 kalkulacji"));
   await page.click("#ws-delete-no");
   eq("saying no closes the question", await page.$eval("#ws-delete-ask", (n) => n.hidden), true);
   eq("and deletes nothing", (await store(page)).projects.find((p) => p.id === "p1").deletedAt, null);
@@ -530,8 +530,9 @@ head("9. delete — asked on the page, and taken back");
     Number.isInteger(after.projects.find((p) => p.id === "p1").deletedAt));
   eq("and so are its two lines",
     after.estimations.filter((e) => e.projectId === "p1" && e.deletedAt).length, 2);
-  // A room is a physical place and outlives the project it was measured for.
-  eq("the room survives the project", after.rooms.filter((r) => !r.deletedAt).length, 1);
+  // D5: rooms are tombstoned with the project
+  eq("the room is tombstoned with the project", after.rooms.filter((r) => !r.deletedAt).length, 0);
+  check("the room has a tombstone", Number.isInteger(after.rooms.find((r) => r.id === "r1").deletedAt));
   eq("and keeps its link to the project", after.rooms.find((r) => r.id === "r1").projectId, "p1");
   eq("the active project moved on", await activeId(page), "p2");
 
@@ -740,12 +741,12 @@ head("15. with JavaScript off");
   // The server-rendered frame remains readable without script.
   eq("the page still has its heading", await text(page, "#ws-title"), "Projekty i pomieszczenia");
   check("and says the data belongs to the account",
-    (await page.innerText("main")).includes("Projekty zapisują się na Twoim koncie"));
+    (await page.innerText("main")).includes("Projekty są częścią Twojego konta"));
   eq("the detail is not shown to somebody who cannot fill it",
     await page.$eval("#ws-project", (n) => n.hidden), true);
 
   const hrefs = await page.$$eval(".ws-links a", (a) => a.map((n) => new URL(n.href).pathname));
-  check("the way on is real links, not buttons", hrefs.includes(urlQuotes("pl")), hrefs.join(", "));
+  check("the way on is real links, not buttons", hrefs.includes("/app/"), hrefs.join(", "));
   await page.close();
   await noJs.close();
 }

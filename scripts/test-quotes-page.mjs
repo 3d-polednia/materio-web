@@ -623,7 +623,7 @@ head("7. chapter XXV's paywall: the wall, the two rungs and the one door through
   eq("the module is replaced by the wall", await guest.$eval("#quo-tool", (n) => n.hidden), true);
   eq("and the wall is on screen", await guest.$eval("#quo-gate", (n) => n.hidden), false);
   eq("the strip above it is gone — the wall says all of it",
-    await guest.$eval("#quo-pro", (n) => n.hidden), true);
+    await guest.$("#quo-pro"), null);
   // Chapter XXV's Free → Pro path, one rung: a guest has no account for a plan to sit on.
   eq("a guest is sent to make an account",
     await guest.$eval('#quo-gate [data-pw-step="account"]', (n) => n.hidden), false);
@@ -669,10 +669,10 @@ head("7. chapter XXV's paywall: the wall, the two rungs and the one door through
   const pro = await open(ctx, QUOTES, { workspace: workspace(), crm: crm(), level: "pro", pro: false });
   eq("no wall for a Pro account", await pro.$eval("#quo-gate", (n) => n.hidden), true);
   eq("the module is there", await pro.$eval("#quo-tool", (n) => n.hidden), false);
-  check("the chip names the plan they are on",
-    (await pro.textContent("#quo-pro-chip")).includes("Pro"));
-  eq("the chip is the one that marks a plan somebody has",
-    await pro.$eval("#quo-pro-chip", (n) => n.classList.contains("on")), true);
+  eq("the page knows it is at Pro level",
+    await pro.locator("html").getAttribute("data-lm-level"), "pro");
+  eq("the account sidebar is visible for a Pro account",
+    await pro.locator("[data-account-sidebar]").isVisible(), true);
   /* A paying account is shown the plan and nothing else: no price, and nothing offering
      to sell them what they already have. */
   /* The whole wall is hidden for them, so the price it carries is hidden with it:
@@ -806,7 +806,7 @@ head("7f. the client quote prints as one complete page");
   eq("the print title uses the translated quote word and a safe number",
     await page.title(), "Wycena W-2026-007");
   await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
-  eq("the page title is restored after printing", await page.title(), "Wyceny — LiczMat");
+  eq("the page title is restored after printing", await page.title(), "Wyceny | LiczMat");
   await page.evaluate(() => pdfFillQuote("q1"));
   eq("the last summary row reads Razem, not the Suma of the row above it",
     await page.$eval('#ws-pdf-doc [data-pdf="totalLabel"]', (th) => th.textContent), "Razem (PLN)");
@@ -1013,22 +1013,15 @@ head("7g. quote-owned materials, project rows, saving and CSV work end to end");
   check("the CSV contains the own material", csv.includes("Taśma uszczelniająca"), csv);
 
   await page.fill("#quo-margin", "17");
-  await Promise.all([
-    page.waitForURL("**/wyceny/?saved=q1"),
-    page.click("#quo-save-draft"),
-  ]);
+  // Owner decision D4 (commit a4c507b0c): 'Zapisz szkic' stays in the editor instead of redirecting
+  await page.click("#quo-save-draft");
+  check("save shows saved confirmation", Boolean(await page.textContent("#quo-saved")));
   eq("save stores a focused margin without waiting for blur", (await liveQuotes(page))[0].marginPct, 17);
-  check("save returns to the list with its marker", await page.locator('#quo-list li[data-id="q1"].quo-saved-row').count() === 1);
 
-  await page.goto(base + `${QUOTES}?id=q1`, { waitUntil: "load" });
-  await page.waitForSelector("html[data-quotes-ready]");
   await page.click("#quo-own-material-list [data-line-del]");
   check("the own material is removed", !(await page.textContent("#quo-own-material-list")).includes("Taśma uszczelniająca"));
   await page.selectOption("#quo-status", "sent");
-  await Promise.all([
-    page.waitForURL("**/wyceny/?saved=q1"),
-    page.click("#quo-save-draft"),
-  ]);
+  await page.click("#quo-save-draft");
   eq("saving a sent quote keeps it sent", (await liveQuotes(page))[0].status, "sent");
   await page.close();
 }
@@ -1125,7 +1118,7 @@ head("7i. VAT rates follow the page language and preserve custom or foreign rate
   eq("the decimal custom VAT is stored", (await liveQuotes(page))[0].vatPct, 8.1);
   await page.evaluate(() => pdfFillQuote("q1"));
   eq("the PDF prints the decimal VAT label",
-    await page.textContent('#ws-pdf-doc [data-pdf="vatLabel"]'), "VAT 8,1 %");
+    await page.textContent('#ws-pdf-doc [data-pdf="vatLabel"]'), "VAT 8,1%");
   await page.selectOption("#quo-vat", "8");
   eq("8% VAT on 550 net is 44", minor(await page.textContent("#quo-fig-vat")), 4400);
   eq("8% VAT on 550 net is 594 gross", minor(await page.textContent("#quo-fig-total")), 59400);

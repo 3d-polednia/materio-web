@@ -241,6 +241,18 @@ const pdfPages = (bytes) => (Buffer.from(bytes).toString("latin1").match(/\/Type
 
 /* ================================================================== 1. the block */
 
+// The project page lost its PDF export on 2026-10-06 (commit b75b71c1e, owner decision).
+// The sections that read that block on /projekty/ stand down when it is not there; the quote
+// document on /wyceny/ is tested by test-quotes-page.mjs.
+const PROJECT_PDF = readFileSync(join(ROOT, "projekty", "index.html"), "utf8").includes('id="ws-pdf-form"');
+
+head("0. where the PDF lives since 2026-10-06 (R1, owner: the quote PDF lives on /wyceny/)");
+check("the project page carries no PDF configurator", !PROJECT_PDF);
+check("the quote page carries the printable document",
+  readFileSync(join(ROOT, "wyceny", "index.html"), "utf8").includes('id="ws-pdf-doc"'));
+
+if (PROJECT_PDF) {
+
 head("1. the configurator is on the project screen");
 {
   const page = await openProject();
@@ -568,6 +580,7 @@ for (const level of [undefined, "liczmat"]) {
     await page.$eval("#ws-pdf-doc", (n) => n.textContent.replace(/\s+/g, " ").slice(0, 160)));
   check(`${who}: no error in the console`, page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
+}
 }
 
 /* ------------------------------------------------------------------ report */

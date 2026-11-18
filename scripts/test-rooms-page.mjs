@@ -418,7 +418,7 @@ head("4. a calculator is filled from a room, and its result filed under it");
   await page.click("[data-ws-apply]");
   await page.waitForSelector("[data-ws-save-box]");
   eq("the room's floor area landed in the form",
-    await page.inputValue('[data-k="area"]'), "7.68");
+    (await page.inputValue('[data-k="area"]')).replace(",", "."), "7.68");
 
   const pick = "[data-ws-room-pick]";
   eq("the save box offers the room the form was filled from",

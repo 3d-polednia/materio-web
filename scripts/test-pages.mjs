@@ -199,7 +199,7 @@ head("mobile");
     `answer ${sizes.big}px, title ${sizes.h1}px`);
   // Every field has to be tappable: 44 px is the size session 4 fixed the controls at.
   const short = await page.evaluate(() =>
-    [...document.querySelectorAll(".calc [data-k]")].filter((el) => el.getBoundingClientRect().height < 44).length);
+    [...document.querySelectorAll(".calc [data-k]")].filter((el) => el.offsetParent !== null && el.getBoundingClientRect().height < 44).length);
   eq("every field is at least 44px tall", short, 0);
   await page.close();
   await ctx.close();

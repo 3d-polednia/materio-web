@@ -343,7 +343,7 @@ head("6. an own material is offered in a calculator, beside the catalogue");
   await page.waitForTimeout(150);
   const cov = await page.$eval('[data-k="cov"]', (e) => e.value);
   const waste = await page.$eval('[data-k="waste"]', (e) => e.value);
-  eq("choosing it fills the package area", cov, "1.44");
+  eq("choosing it fills the package area", cov.replace(",", "."), "1.44");
   eq("and the allowance", waste, "7");
   check("and the page says which material went in",
     /Kowalskiego/.test(await page.$eval(".mat-open.has-material", (e) => e.textContent)));

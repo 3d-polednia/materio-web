@@ -163,10 +163,11 @@ async function context(options) {
 /** Which "the page is wired" mark to wait for, chosen by the address being opened. */
 function readyMark(lang, url) {
   const path = url.split("?")[0];
-  if (path === urlProjects(lang)) return "html[data-ws-ready]";
-  if (path === urlClients(lang)) return "html[data-crm-ready]";
-  if (path === urlQuotes(lang)) return "html[data-quotes-ready]";
-  if (path.startsWith(urlCalcIndex(lang)) && path !== urlCalcIndex(lang)) {
+  const LANGS = ["pl", "cs", "de", "en", "es", "fr", "hr", "it", "nl", "ro", "sk", "sr", "uk"];
+  if (LANGS.some((l) => path === urlProjects(l))) return "html[data-ws-ready]";
+  if (LANGS.some((l) => path === urlClients(l))) return "html[data-crm-ready]";
+  if (LANGS.some((l) => path === urlQuotes(l))) return "html[data-quotes-ready]";
+  if (LANGS.some((l) => path.startsWith(urlCalcIndex(l)) && path !== urlCalcIndex(l))) {
     return '.calc[data-wired="1"]';
   }
   return null;
@@ -281,7 +282,7 @@ async function walk(cfg) {
   eq("the currency picker stands on the visitor's currency",
     await page.inputValue("#currency-select"), cur);
   eq("the header's account button carries no level, because nobody is signed in",
-    await page.getAttribute(".nav-cta[data-account-cta]", "data-level"), null);
+    await page.getAttribute(".nav-cta", "data-level"), null);
   /* A guest is the ABSENCE of the mark, not a value of it: src/template.mjs stamps
      `data-lm-level` only when `liczmat-signed-in` says something, and the stylesheet hides
      a LICZMAT link only when the level is known. No script means no `.js` class means the
@@ -353,6 +354,7 @@ async function walk(cfg) {
     await app.locator('[data-auth-view="signup"]').isVisible(), true);
   await app.fill("#signup-email", EMAIL);
   await app.fill("#signup-password", PASSWORD);
+  await app.fill("#signup-password-repeat", PASSWORD);
   await app.click("#signup-form button[type=submit]");
   // 2026-09-30: signing up from the calculator's link goes back to it by itself
   // (renderNext() in assets/app.js); who the account belongs to is test-account-page §3.
@@ -370,8 +372,9 @@ async function walk(cfg) {
   await go(CALC);
   eq("back on the calculator, the browser knows it is signed in now",
     await page.getAttribute("html", "data-lm-level"), "liczmat");
-  eq("the header's account button says so too",
-    await page.getAttribute(".nav-cta[data-account-cta]", "data-level"), "liczmat");
+  // AUDYT3 C6 (commit 45a4dbb51): header account button stays unmarked
+  eq("the header's account button stays unmarked",
+    await page.getAttribute(".nav-cta", "data-level"), null);
   eq("and the sentence under the result stops offering an account",
     await page.locator(".ws-save-account a").count(), 0);
   // Owner decision 2026-09-26: work tools are reached through Moje konto, never the
@@ -463,8 +466,8 @@ async function walk(cfg) {
     await page.locator('#cost-gate [data-pw-step="upgrade"]').first().isHidden(), false);
   eq('"inne koszty" is behind it too, being nothing but money',
     await page.locator("#cost-other-tool").isHidden(), true);
-  eq("the PDF export is walled as well", await page.locator("#pdf-tool").isHidden(), true);
-  eq("with its own wall in front of it", await page.locator("#pdf-gate").isHidden(), false);
+  // R1 (commit b75b71c1e): the project page carries no PDF export at all.
+  eq("the project page has no PDF export to wall off", await page.locator("#pdf-tool, #pdf-gate").count(), 0);
 
   /* Never a dead control: the price field is not on the form at all, rather than sitting
      there taking a number nothing will store. */
@@ -499,6 +502,7 @@ async function walk(cfg) {
      one field different on the profile document. */
   const pro = watch(await ctx.newPage());
   await pro.addInitScript(([email, password]) => {
+    localStorage.removeItem("__fb_signed_in");
     window.__fbAccounts = {
       [email]: {
         password,
@@ -541,7 +545,7 @@ async function walk(cfg) {
   eq("the three figures are on the page now", await page.locator("#cost-tool").isHidden(), false);
   eq("and the wall is gone", await page.locator("#cost-gate").isHidden(), true);
   eq('"inne koszty" is back', await page.locator("#cost-other-tool").isHidden(), false);
-  eq("and so is the PDF export", await page.locator("#pdf-tool").isHidden(), false);
+  eq("and still no PDF export on the project page", await page.locator("#pdf-tool, #pdf-gate").count(), 0);
 
   await page.click(`${MATS} li[data-id="${matId}"] [data-edit]`);
   await page.waitForSelector(`${MATS} [data-f="priceMajor"]`);
@@ -589,8 +593,9 @@ async function walk(cfg) {
   await go(urlClients(lang));
   eq("the wall is down", await page.locator("#crm-gate").isHidden(), true);
   eq("the module is open", await page.locator("#crm-tool").isHidden(), false);
-  check("and the chip says which plan opened it",
-    (await page.locator("#crm-pro-chip").getAttribute("class") || "").includes("on"));
+  // AUDYT3 C6 (commit 45a4dbb51): plan mark is in the sidebar
+  eq("and the page knows it is at Pro level",
+    await page.getAttribute("html", "data-lm-level"), "pro");
   await page.fill("#crm-client-name", "Jan Kowalski");
   await page.fill("#crm-client-phone", "600 100 200");
   await page.fill("#crm-client-email", "jan@example.com");
@@ -674,16 +679,16 @@ async function walk(cfg) {
   await page.fill("#quo-name", "Łazienka QA — wycena");
   await page.selectOption("#quo-project", { label: "Remont QA" });
   await page.click("#quo-form button[type=submit]");
-  await page.waitForSelector("#quo-list a[data-open]");
+  // Commit 62ebdd3a2: creation opens the new quote directly
+  await page.waitForURL(/\?id=/);
+  await page.waitForSelector("#quo-body:not([hidden])");
   const quote = (await crmStore(page)).quotes[0];
   eq("the quote stores the project and nothing else of the chain", quote.projectId, PROJECT);
   eq("it stores no material total", "materialsMinor" in quote, false);
-
   const quoteUrl = `${urlQuotes(lang)}?id=${encodeURIComponent(quote.id)}`;
-  await follow("#quo-list a[data-open]", quoteUrl);
   await page.fill("#quo-labour-name", "Układanie");
   await page.fill("#quo-labour-qty", "24");
-  await page.fill("#quo-labour-unit", "m²");
+  await page.selectOption("#quo-labour-unit", { index: 1 });
   await page.fill("#quo-labour-price", "80");
   await page.click("#quo-labour-form button[type=submit]");
   await page.waitForSelector("#quo-labour-list li[data-line]");
@@ -756,9 +761,10 @@ async function walk(cfg) {
   eq("the language link carries the quote across", 
     await page.getAttribute(`.foot-langs a[data-lang="${second}"]`, "href"), otherQuoteUrl);
   await follow(`.foot-langs a[data-lang="${second}"]`, otherQuoteUrl);
+  await page.waitForSelector("#quo-body:not([hidden])");
   eq("the other language opened", await page.getAttribute("html", "lang"), second);
   eq("the same quote is on the screen",
-    (await textOf(page, "#quo-body")).includes("Łazienka QA — wycena"), true);
+    (await textOf(page, "#quo-title")).includes("Łazienka QA — wycena"), true);
   eq("its total did not move because the words did",
     minorOf(await textOf(page, "#quo-fig-total")), beforeSwitch);
   eq("chapter VI: the currency is not the language, and did not follow it",
@@ -826,6 +832,9 @@ async function walk(cfg) {
     new URL(page.url()).pathname + new URL(page.url()).search, clientUrl);
   eq("with their name still on the screen",
     (await textOf(page, "#crm-client-body")).includes("Jan Kowalski"), true);
+  check("chapter VI: nothing on the site converted an amount at a rate",
+    (await crmStore(page)).quotes[0].currencyCode === cur
+    && (await store(page)).estimations.every((e) => e.currencyCode === cur));
 
   head(`${who} — 16e. signed out again: the wall goes back up, the counting does not`);
   const out = watch(await ctx.newPage());
@@ -843,42 +852,38 @@ async function walk(cfg) {
   }, [EMAIL, PASSWORD]);
   await out.goto(base + URL_APP, { waitUntil: "domcontentloaded" });
   await out.waitForSelector("html[data-app-ready]", { state: "attached", timeout: 15000 });
-  await out.fill("#signin-email", EMAIL);
-  await out.fill("#signin-password", PASSWORD);
-  await out.click("#signin-form button[type=submit]");
-  await out.locator("#app-workspace").waitFor({ state: "visible", timeout: 10000 });
+  if (await out.locator("#signin-email").isVisible()) {
+    await out.fill("#signin-email", EMAIL);
+    await out.fill("#signin-password", PASSWORD);
+    await out.click("#signin-form button[type=submit]");
+    await out.locator("#app-workspace").waitFor({ state: "visible", timeout: 10000 });
+  }
   await out.click("#app-signout");
   await out.locator("#app-auth").waitFor({ state: "visible", timeout: 10000 });
   eq("signing out clears the session hint", await level(out), null);
   await out.close();
 
-  /* Owner decision 2026-09-26: signing out hides account work but never wipes the local
-     hand-off copy. Counting remains public. */
+  // Owner decision D1 of 2026-10-05 (commit da67e03a7, AUDYT3 L2):
+  // signing out takes the account's copy out of this browser.
   await go(openProject);
-  eq("the project is still here", (await store(page)).projects.length, 1);
+  eq("the account's copy was removed from the browser on sign out", (await store(page)).projects, undefined);
   eq("the account card replaces the project tool",
     await page.locator("[data-account-guest]").isVisible(), true);
-  const kept = await store(page);
-  eq("the price it was given is still in the store",
-    kept.shoppingItems.find((s) => s.id === matId).estimatedCostMinor, materialsMinor);
-  eq("and so is the cost nobody calculated",
-    kept.estimations.find((e) => (e.inputJson || "").includes("manual")).totalCostMinor,
-    OTHER_MINOR);
   eq("the whole project tool is hidden", await page.locator("[data-account-tool]").isHidden(), true);
   eq("the Pro wall does not precede the account card", await page.locator("#cost-gate").isVisible(), false);
   eq("and the total is not printed anywhere on the screen",
     await page.locator("#ws-project-total").isVisible(), false);
-  eq("the PDF export is shut too", await page.locator("#pdf-tool").isHidden(), true);
+  eq("no PDF export on the project page", await page.locator("#pdf-tool, #pdf-gate").count(), 0);
   eq("the header's account button drops its mark",
-    await page.getAttribute(".nav-cta[data-account-cta]", "data-level"), null);
+    await page.getAttribute(".nav-cta", "data-level"), null);
 
   await go(urlClients(lang));
   eq("the Pro page shows the account card before its Pro wall",
     await page.locator("[data-account-guest]").isVisible(), true);
   eq("the Pro wall stays inside the hidden account tool",
     await page.locator("#crm-gate").isVisible(), false);
-  eq("the client rows were not deleted by any of it",
-    (await crmStore(page)).clients.length, 1);
+  eq("the clients were removed from the browser on sign out too",
+    (await crmStore(page)).clients, undefined);
 
   /* ------------------------------------------------- what held for the whole walk */
 
@@ -887,9 +892,6 @@ async function walk(cfg) {
     await page.getAttribute("html", "data-theme"), theme);
   eq("so did the language", await page.getAttribute("html", "lang"), lang);
   eq("and the currency", await page.inputValue("#currency-select"), cur);
-  check("chapter VI: nothing on the site converted an amount at a rate",
-    (await crmStore(page)).quotes[0].currencyCode === cur
-    && (await store(page)).estimations.every((e) => e.currencyCode === cur));
   check("not one console error in the whole walk",
     page.lmErrors.length === 0, page.lmErrors.join("\n      "));
 

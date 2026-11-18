@@ -242,12 +242,14 @@ for (const width of [1400, 900, 390]) {
   const ctx = await context({ width: 1400, height: 900 });
   const page = await openLocal(ctx, "/projekty/", { "materio-workspace-v1": JSON.stringify(workspace),
     "liczmat-signed-in": "pro" });
-  const note = await visibleRect(page, "p.src-note", "source note");
   const body = await visibleRect(page, "#ws-index > p.muted:not(.src-note)", "body paragraph");
-  if (note) check("source note uses balanced wrapping",
-    await page.locator("p.src-note").first().evaluate((node) => [getComputedStyle(node).textWrap, getComputedStyle(node).textWrapStyle].includes("balance")));
   if (body) check("body paragraph uses pretty wrapping",
     await page.locator("#ws-index > p.muted:not(.src-note)").first().evaluate((node) => [getComputedStyle(node).textWrap, getComputedStyle(node).textWrapStyle].includes("pretty")));
+  await page.goto(base + "/wyceny/", { waitUntil: "load" });
+  await page.waitForSelector("html[data-quotes-ready]");
+  const note = await visibleRect(page, "p.src-note", "source note");
+  if (note) check("source note uses balanced wrapping",
+    await page.locator("p.src-note").first().evaluate((node) => [getComputedStyle(node).textWrap, getComputedStyle(node).textWrapStyle].includes("balance")));
   await ctx.close();
 }
 

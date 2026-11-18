@@ -243,7 +243,7 @@ head("2. what the saved line keeps (chapter XV)");
 
   // Every field carries its dictionary key, not the Polish label that was on screen.
   const keys = snap.fields.map((f) => f.l).join(",");
-  eq("every field is stored by key", keys, "fld_area,fld_pkg_cov,fld_waste,fld_price_pkg");
+  eq("every field is stored by key", keys, "fld_input_mode,fld_area,fld_pkg_cov,fld_waste,fld_price_pkg");
 
   // A second calculation is a second result: the strip about the first one is stale and
   // must stop claiming this number is saved.

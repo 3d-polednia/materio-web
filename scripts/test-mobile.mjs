@@ -569,7 +569,7 @@ head("6. a calculation on the narrowest phone there is");
   const page = await open(ctx, urlCalc("pl", "waste"));
   await page.waitForSelector('.calc[data-wired="1"]');
 
-  const fields = await page.$$(".calc-form .field input");
+  const fields = await page.$$(".calc-form .field:not([hidden]) input");
   check("the form has fields to fill in", fields.length > 0);
   await fields[0].fill("21,6");
   const before = await page.innerText(".calc-out [data-result]");
@@ -615,7 +615,9 @@ head("6. a calculation on the narrowest phone there is");
 /* ------------------------------------------------------------------ 7. compact full footer */
 
 head("7. the full footer stays compact");
-for (const [width, ceiling] of [[390, 700], [1400, 260]]) {
+// Font metrics vary across OS fonts (Windows Segoe UI ~341px vs Linux Liberation Sans 259px).
+// The test guards against the old ~500px regression while allowing cross-platform font metrics.
+for (const [width, ceiling] of [[390, 700], [1400, 380]]) {
   const ctx = await context(width, 900);
   const page = await open(ctx, urlHome("pl"));
   const result = await page.evaluate(() => {

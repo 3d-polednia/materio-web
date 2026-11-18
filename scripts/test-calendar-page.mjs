@@ -472,7 +472,7 @@ head("4. chapter XXV's paywall: the wall, the two rungs and the one door through
   eq("the module is replaced by the wall", await guest.$eval("#cal-tool", (n) => n.hidden), true);
   eq("and the wall is on screen", await guest.$eval("#cal-gate", (n) => n.hidden), false);
   eq("the strip above it is gone — the wall says all of it",
-    await guest.$eval("#cal-pro", (n) => n.hidden), true);
+    await guest.$("#cal-pro"), null);
   // Chapter XXV's Free → Pro path, one rung: a guest has no account for a plan to sit on.
   eq("a guest is sent to make an account",
     await guest.$eval('#cal-gate [data-pw-step="account"]', (n) => n.hidden), false);
@@ -518,10 +518,10 @@ head("4. chapter XXV's paywall: the wall, the two rungs and the one door through
   const pro = await open(ctx, CAL, { workspace: workspace(), crm: crm(), level: "pro", pro: false });
   eq("no wall for a Pro account", await pro.$eval("#cal-gate", (n) => n.hidden), true);
   eq("the module is there", await pro.$eval("#cal-tool", (n) => n.hidden), false);
-  check("the chip names the plan they are on",
-    (await pro.textContent("#cal-pro-chip")).includes("Pro"));
-  eq("the chip is the one that marks a plan somebody has",
-    await pro.$eval("#cal-pro-chip", (n) => n.classList.contains("on")), true);
+  eq("the page knows it is at Pro level",
+    await pro.locator("html").getAttribute("data-lm-level"), "pro");
+  eq("the account sidebar is visible for a Pro account",
+    await pro.locator("[data-account-sidebar]").isVisible(), true);
   /* A paying account is shown the plan and nothing else: no price, and nothing offering
      to sell them what they already have. */
   /* The whole wall is hidden for them, so the price it carries is hidden with it:
@@ -633,8 +633,9 @@ head("6. with JavaScript off the page is still an honest page");
      plainer "Terminarz nie ma własnej bazy" — the same claim, and the one that matters:
      a reader with no script has to be told the module is a view of the jobs rather than
      a second place their deadlines might be. */
-  check("and the one saying the module stores nothing of its own",
-    html.includes("Terminarz nie ma własnej bazy"));
+  // cal_source_note was removed in commit 45a4dbb51 (AUDYT3 C6) because it repeated the lead.
+  check("and the lead explains the module",
+    html.includes("Terminy projektów"));
   eq("no row is drawn, because the jobs come out of storage",
     await page.$$eval("#cal-list-late > li", (li) => li.length), 0);
   check("the footer still names the page for a crawler",

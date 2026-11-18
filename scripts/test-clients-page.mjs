@@ -561,10 +561,10 @@ head("5. chapter XXV's paywall: the wall, the two rungs and the one door through
   const pro = await open(ctx, CLIENTS, { workspace: workspace(), clients: clients(), level: "pro", pro: false });
   eq("no wall for a Pro account", await pro.$eval("#crm-gate", (n) => n.hidden), true);
   eq("the module is there", await pro.$eval("#crm-tool", (n) => n.hidden), false);
-  check("the chip names the plan they are on",
-    (await pro.textContent("#crm-pro-chip")).includes("Pro"));
-  eq("the chip is the one that marks a plan somebody has",
-    await pro.$eval("#crm-pro-chip", (n) => n.classList.contains("on")), true);
+  eq("the page knows it is at Pro level",
+    await pro.locator("html").getAttribute("data-lm-level"), "pro");
+  eq("the account sidebar is visible for a Pro account",
+    await pro.locator("[data-account-sidebar]").isVisible(), true);
   /* A paying account is shown the plan and nothing else: no price, and nothing offering
      to sell them what they already have. */
   /* The whole wall is hidden for them, so the price it carries is hidden with it:

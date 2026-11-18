@@ -30,9 +30,13 @@ export function initializeApp(config) { return { config }; }
 
 export const FAKE_AUTH = `
 const S = (window.__fb = window.__fb || {
-  accounts: window.__fbAccounts || {},
+  accounts: window.__fbAccounts || (typeof localStorage !== "undefined" && JSON.parse(localStorage.getItem("__fb_accounts") || "{}")) || {},
   calls: [],
-  user: window.__fbSignedIn ? { uid: window.__fbSignedIn } : null,
+  user: window.__fbSignedIn ? { uid: window.__fbSignedIn } : (
+    (typeof localStorage !== "undefined" && localStorage.getItem("__fb_signed_in"))
+      ? { uid: localStorage.getItem("__fb_signed_in") }
+      : null
+  ),
   listeners: [],
 });
 window.__fbCalls = S.calls;
@@ -61,7 +65,14 @@ function withToken(u) {
   }
   return u;
 }
-function setUser(u) { S.user = withToken(u); emit(); }
+function setUser(u) {
+  S.user = withToken(u);
+  try {
+    if (u && u.uid) localStorage.setItem("__fb_signed_in", u.uid);
+    else localStorage.removeItem("__fb_signed_in");
+  } catch (e) {}
+  emit();
+}
 
 export function getAuth() {
   if (!S.auth) {
@@ -106,6 +117,7 @@ export function createUserWithEmailAndPassword(auth, email, password) {
     displayName: "", providerData: [{ providerId: "password" }],
   };
   S.accounts[email] = { password, user };
+  try { localStorage.setItem("__fb_accounts", JSON.stringify(S.accounts)); } catch (e) {}
   setUser(user);
   return Promise.resolve({ user });
 }
@@ -166,7 +178,26 @@ export function signInWithPopup() {
 `;
 
 export const FAKE_STORE = `
-const DOCS = (window.__fbDocs = window.__fbDocs || new Map());
+function _loadDocs() {
+  const m = new Map();
+  try {
+    const raw = typeof localStorage !== "undefined" && localStorage.getItem("__fb_docs");
+    if (raw) JSON.parse(raw).forEach(([k, v]) => m.set(k, v));
+  } catch (e) {}
+  return m;
+}
+function _saveDocs(m) {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("__fb_docs", JSON.stringify([...m.entries()]));
+    }
+  } catch (e) {}
+}
+const DOCS = (window.__fbDocs = window.__fbDocs || _loadDocs());
+const origSet = DOCS.set.bind(DOCS);
+const origDel = DOCS.delete.bind(DOCS);
+DOCS.set = (k, v) => { const r = origSet(k, v); _saveDocs(DOCS); return r; };
+DOCS.delete = (k) => { const r = origDel(k); _saveDocs(DOCS); return r; };
 const key = (parts) => parts.join("/");
 
 /* Tests may opt into server round trips with window.__fbLatencyMs. Writes still apply

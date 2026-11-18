@@ -202,7 +202,7 @@ async function open(ctx, url, opts = {}) {
 
 const rows = (page, sel) =>
   page.$$eval(`${sel} > li`, (li) => li.map((n) => n.textContent.replace(/\s+/g, " ").trim()));
-const text = (page, sel) => page.$eval(sel, (n) => n.innerText.trim());
+const text = (page, sel) => page.$eval(sel, (n) => n.innerText.replace(/\s+/g, " ").trim());
 const store = (page) => page.evaluate(() => JSON.parse(localStorage.getItem("materio-workspace-v1") || "{}"));
 const items = async (page) => (await store(page)).shoppingItems || [];
 
@@ -604,7 +604,7 @@ head("4. four languages");
       { workspace: fixture(), active: "p1", lang });
     const body = await page.innerText("#ws-project");
     check(`${lang}: the section is headed in that language`, body.includes(WANT[lang][0]), WANT[lang][0]);
-    check(`${lang}: the aisle is in that language`, body.includes(WANT[lang][1]), WANT[lang][1]);
+    check(`${lang}: the aisle is in that language`, body.replace(/\s+/g, " ").includes(WANT[lang][1]), WANT[lang][1]);
     eq(`${lang}: so is the tally`, await text(page, "#ws-mat-tally"), WANT[lang][2]);
     check(`${lang}: and the tick`, (await page.innerText(MATS)).includes(WANT[lang][3]), WANT[lang][3]);
     check(`${lang}: nothing shows a key instead of a word`,
@@ -625,7 +625,7 @@ head("4b. switching language on an open project redraws the list");
   // The rows are written by script, so they stay in the old language unless something
   // redraws them — the defect session 13 fixed on /app/ and session 16 on this page.
   const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: fixture(), active: "p1" });
-  check("it starts in Polish", (await page.innerText(MATS)).includes("Płytki i gres"));
+  check("it starts in Polish", (await page.innerText(MATS)).replace(/\s+/g, " ").includes("Płytki i gres"));
 
   // The switcher navigates — it does not rewrite the page — and since session 16 the link
   // carries the query string, which is what keeps the open project open.
@@ -719,10 +719,10 @@ head("7. with JavaScript off");
  * what `open()` plants; this one runs without a plan and checks that the arrow, the list,
  * the tick and the hand-typed row all still work, and that not one amount is on the page.
  */
-head("9. a guest keeps the whole shopping list and gets none of the prices");
+head("9. a free account keeps the whole shopping list and gets none of the prices");
 {
   const page = await open(ctx, `${PROJECTS}?id=p1`,
-    { workspace: fixture(), active: "p1", pro: false });
+    { workspace: fixture(), active: "p1", level: "liczmat" });
 
   const list = await rows(page, MATS);
   check("every material is on the list", list.length >= 2, String(list.length));

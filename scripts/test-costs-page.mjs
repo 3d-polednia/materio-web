@@ -238,8 +238,9 @@ head("1. chapter XVII's three figures stand at the top of the project");
   // of this page — the money and the PDF export beside it.
   eq("the figures sit in the open, not behind a wall", await page.locator("#cost-tool").isHidden(), false);
   eq("and no wall is drawn over them", await page.locator("#cost-gate").isHidden(), true);
-  eq("the PDF configurator is unlocked too", await page.locator("#pdf-tool").isHidden(), false);
-  eq("with no wall over it either", await page.locator("#pdf-gate").isHidden(), true);
+  // R1 (commit b75b71c1e, 2026-10-06): the project page has no PDF export; the quote's
+  // document on /wyceny/ is the only one (test-quotes-page.mjs 7f).
+  eq("the project page carries no PDF configurator", await page.locator("#pdf-tool, #pdf-gate").count(), 0);
 
   // The calculation and the material it produced are the same money. If the summary added
   // the estimate to the shopping list, this project would come to 3 119,70 of materials.
@@ -639,9 +640,7 @@ for (const level of ["liczmat"]) {
     await page.locator("#cost-gate").isHidden(), false);
   eq(`${who}: "inne koszty" is behind it too`,
     await page.locator("#cost-other-tool").isHidden(), true);
-  eq(`${who}: and so is the PDF export`, await page.locator("#pdf-tool").isHidden(), true);
-  eq(`${who}: with its own wall in front of it`,
-    await page.locator("#pdf-gate").isHidden(), false);
+  eq(`${who}: no PDF export to wall off (R1)`, await page.locator("#pdf-tool, #pdf-gate").count(), 0);
 
   /* Chapter XXV's two rungs, and exactly the one this visitor stands on: a guest has no
      account for a plan to sit on, somebody signed in has. */
